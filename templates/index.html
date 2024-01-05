@@ -62,7 +62,7 @@
         {% endfor %}
     </table>
 
-    <button id="drawTeams">Losuj Drużyny</button>
+<!--    <button id="drawTeams">Losuj Drużyny</button>-->
     <button id="clearSelection">Wyczyść</button>
 
     <script>
@@ -104,8 +104,8 @@
             });
 
             $('#drawTeams').click(function() {
-    $.get('/draw_teams', function(data) {
-        window.location.href = '/draw_teams'; // Przekierowanie do strony z wynikami losowania
+    $.get('/losuj', function(data) {
+        window.location.href = '/losuj'; // Przekierowanie do strony z wynikami losowania
     });
 });
 

@@ -27,7 +27,7 @@ def modify_total_attributes(player):
     return total_attributes * (1 + change_percent)
 
 # Losowanie drużyn
-def draw_teams(players):
+def losuj(players):
     for player in players:
         player['modified_total'] = modify_total_attributes(player)
 
@@ -92,10 +92,10 @@ def update_status():
 
 
 # Endpoint do losowania drużyn
-@app.route('/draw_teams')
-def api_draw_teams():
+@app.route('/losuj')
+def api_losuj():
     players = [player for player in load_data() if player['is_present'] and not player['on_break']]
-    team_a, team_b, sum_a, sum_b = draw_teams(players)
+    team_a, team_b, sum_a, sum_b = losuj(players)
     current_day = datetime.now().strftime('%A')
     return render_template('teams.html', team_a=team_a, team_b=team_b, sum_a=sum_a, sum_b=sum_b, current_day=current_day)
 

@@ -138,8 +138,8 @@
         "technika": 9,
         "gra_zespolowa": 9,
         "uderzenie": 8,
-        "is_present": true,
-        "on_break": false,
+        "is_present": false,
+        "on_break": true,
         "info": ""
     },
     {
