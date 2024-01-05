@@ -1,7 +1,8 @@
-from flask import Flask, jsonify, request, render_template
+from datetime import datetime
+
+from flask import Flask, render_template, jsonify, request
 import json
 import random
-from datetime import datetime
 
 app = Flask(__name__)
 
@@ -13,76 +14,73 @@ def load_data():
 # Zapisz dane do pliku JSON
 def save_data(data):
     with open("players.json", "w") as file:
-        json.dump(data, file)
+        json.dump(data, file, indent=4)
 
+# Modyfikacja sumy cech zawodnika
 def modify_total_attributes(player):
     attribute_keys = ['kondycja', 'technika', 'gra_zespolowa', 'uderzenie']
     total_attributes = sum(player.get(key, 0) for key in attribute_keys)
-
     change_percent = random.uniform(-0.1, 0.1)
-    modified_total = total_attributes * (1 + change_percent)
+    return total_attributes * (1 + change_percent)
 
-    return modified_total
-
-
-
-def draw_teams():
-    players = load_data()
+# Losowanie drużyn
+def draw_teams(players):
     for player in players:
-        if player['is_present'] and not player['on_break']:
-            player['modified_total'] = modify_total_attributes(player)
+        player['modified_total'] = modify_total_attributes(player)
 
-    present_players = [player for player in players if player['is_present'] and not player['on_break']]
-    random.shuffle(present_players)
-    mid = len(present_players) // 2
-    team_a, team_b = present_players[:mid], present_players[mid:]
+    # Sortowanie zawodników i dzielenie na drużyny
+    sorted_players = sorted(players, key=lambda x: x['modified_total'], reverse=True)
+    team_a, team_b = [], []
+    sum_a, sum_b = 0, 0
 
-    sum_attributes_team_a = sum(player['modified_total'] for player in team_a)
-    sum_attributes_team_b = sum(player['modified_total'] for player in team_b)
+    for player in sorted_players:
+        if sum_a <= sum_b:
+            team_a.append(player)
+            sum_a += player['modified_total']
+        else:
+            team_b.append(player)
+            sum_b += player['modified_total']
 
-    sum_attributes_team_a = round(sum_attributes_team_a)
-    sum_attributes_team_b = round(sum_attributes_team_b)
+    sum_a = round(sum_a)
+    sum_b = round(sum_b)
 
-    return team_a, team_b, sum_attributes_team_a, sum_attributes_team_b
+    return team_a, team_b, sum_a, sum_b
 
-
-
-# Strona główna z tabelą zawodników
+# Strona główna
 @app.route('/')
 def index():
     players = load_data()
     return render_template('index.html', players=players)
 
-# Endpoint do aktualizacji statusu zawodnika
+# Endpoint do aktualizacji stanu zawodnika
 @app.route('/update_status', methods=['POST'])
 def update_status():
     data = request.json
     players = load_data()
     for player in players:
-        if player["name"] == data.get("name"):
-            player["is_present"] = data.get("is_present", False)  # Domyślnie False, jeśli klucz nie istnieje
-            player["on_break"] = data.get("on_break", False)  # Domyślnie False
+        if player["name"] == data["name"]:
+            player["is_present"] = data["is_present"]
+            player["on_break"] = data["on_break"]
     save_data(players)
     return jsonify(success=True)
 
-
+# Endpoint do losowania drużyn
 @app.route('/draw_teams')
 def api_draw_teams():
-    print("Losowanie drużyn")  # Do debugowania
-    team_a, team_b, sum_a, sum_b = draw_teams()
+    players = [player for player in load_data() if player['is_present'] and not player['on_break']]
+    team_a, team_b, sum_a, sum_b = draw_teams(players)
     current_day = datetime.now().strftime('%A')
     return render_template('teams.html', team_a=team_a, team_b=team_b, sum_a=sum_a, sum_b=sum_b, current_day=current_day)
 
+# Endpoint do wyczyszczenia selekcji
 @app.route('/clear_selection', methods=['POST'])
 def clear_selection():
     players = load_data()
     for player in players:
         player['is_present'] = False
         player['on_break'] = False
-    save_data(players)  # Funkcja zapisująca zmiany do pliku JSON
-    return jsonify({'success': True})
-
-
+    save_data(players)
+    return jsonify(success=True)
 
 if __name__ == '__main__':
     app.run(debug=True)
