@@ -3,48 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Zawodnicy</title>
-    <style>
-        body, button, input {
-            font-size: 25px;
-            font-family: Arial;
-        }
-        .player-row {
-            background-color: white;
-        }
-        .player-present {
-            background-color: lightgreen;
-        }
-        .player-on-break {
-            background-color: lightblue;
-        }
-        .team-a {
-            background-color: pink;
-        }
-        .team-b {
-            background-color: pink;
-        }
-        input[type="checkbox"] {
-            width: 30px;  /* szerokość checkboxa */
-            height: 30px; /* wysokość checkboxa */
-            cursor: pointer; /* opcjonalnie, zmienia kursor na wskaźnik */
-        }
-        table {
-            border-collapse: collapse; /* Usuwa podwójne ramki */
-            width: 70%; /* Opcjonalnie, rozciąga tabelę na całą dostępną szerokość */
-        }
-        th, td {
-            border: 1px solid black; /* Czarna ramka dla komórek tabeli */
-            text-align: left; /* Wyrównanie tekstu do lewej */
-            padding: 8px; /* Dodaje padding do komórek */
-        }
-        th {
-            background-color: #D3D3D3; /* Szare tło dla nagłówków */
-        }
-        p {
-            font-weight: bold;
-            font-weight: 800;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="static/styles.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
@@ -68,7 +27,7 @@
     </table>
 
 <!--    <button id="drawTeams">Losuj Drużyny</button>-->
-    <br><button id="clearSelection">WYCZYŚĆ - gdy chesz zacząć nową rozrgrywkę</button>
+    <br><button class="button-19" id="clearSelection">WYCZYŚĆ - gdy chesz zacząć nową rozrgrywkę</button>
 
     <script>
         $(document).ready(function() {
@@ -141,6 +100,7 @@ $('.info-input').change(function() {
 
             $('#clearSelection').click(function() {
     $('.present-checkbox, .break-checkbox').prop('checked', false);
+    $('.present-checkbox, .break-checkbox').prop('disabled', false);
     updatePlayerRowStyles();
 
     // Wysyłanie żądania do serwera Flask, aby zaktualizować plik JSON

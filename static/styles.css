@@ -1,0 +1,120 @@
+.container {
+            display: flex;
+            justify-content: center;
+        }
+        .przyciski {
+            justify-content: center;
+            position: absolute;
+            left: 45%;
+        }
+        .column {
+            margin: 10px;
+            padding: 20px;
+            border: 1px solid black;
+            border-radius: 5px;
+        }
+        .team-a { background-color: {% if current_day == 'Tuesday' %}pink{% else %}white{% endif %}; }
+        .team-b { background-color: {% if current_day == 'Thursday' %}pink{% else %}white{% endif %}; }
+        body, button, input {
+            font-size: 20px;
+        }
+        .button-19 {
+  appearance: button;
+  background-color: #1899D6;
+  border: solid transparent;
+  border-radius: 16px;
+  border-width: 0 0 4px;
+  box-sizing: border-box;
+  color: #FFFFFF;
+  cursor: pointer;
+  display: inline-block;
+  font-family: din-round,sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .8px;
+  line-height: 20px;
+  margin: 0;
+  outline: none;
+  overflow: visible;
+  padding: 13px 16px;
+  text-align: center;
+  text-transform: uppercase;
+  touch-action: manipulation;
+  transform: translateZ(0);
+  transition: filter .2s;
+  user-select: none;
+  -webkit-user-select: none;
+  vertical-align: middle;
+  white-space: nowrap;
+  width: 100;
+
+}
+
+.button-19:after {
+  background-clip: padding-box;
+  background-color: #1CB0F6;
+  border: solid transparent;
+  border-radius: 16px;
+  border-width: 0 0 4px;
+  bottom: -4px;
+  content: "";
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: -1;
+}
+
+.button-19:main,
+.button-19:focus {
+  user-select: auto;
+}
+
+.button-19:hover:not(:disabled) {
+  filter: brightness(1.1);
+  -webkit-filter: brightness(1.1);
+}
+
+.button-19:disabled {
+  cursor: auto;
+}
+
+.button-19:active {
+  border-width: 4px 0 0;
+  background: none;
+}
+body, button, input {
+            font-size: 25px;
+            font-family: Arial;
+        }
+        .player-row {
+            background-color: white;
+        }
+        .player-present {
+            background-color: lightgreen;
+        }
+        .player-on-break {
+            background-color: lightblue;
+        }
+        
+        input[type="checkbox"] {
+            width: 30px;  /* szerokość checkboxa */
+            height: 30px; /* wysokość checkboxa */
+            cursor: pointer; /* opcjonalnie, zmienia kursor na wskaźnik */
+        }
+        table {
+            border-collapse: collapse; /* Usuwa podwójne ramki */
+            width: 70%; /* Opcjonalnie, rozciąga tabelę na całą dostępną szerokość */
+        }
+        th, td {
+            border: 1px solid black; /* Czarna ramka dla komórek tabeli */
+            text-align: left; /* Wyrównanie tekstu do lewej */
+            padding: 8px; /* Dodaje padding do komórek */
+        }
+        th {
+            background-color: #D3D3D3; /* Szare tło dla nagłówków */
+        }
+        p {
+            font-weight: bold;
+            font-weight: 800;
+        }

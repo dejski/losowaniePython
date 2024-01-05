@@ -3,23 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Wylosowane Drużyny</title>
-    <style>
-        .container {
-            display: flex;
-            justify-content: center;
-        }
-        .column {
-            margin: 10px;
-            padding: 20px;
-            border: 1px solid black;
-            border-radius: 5px;
-        }
-        .team-a { background-color: {% if current_day == 'Tuesday' %}pink{% else %}white{% endif %}; }
-        .team-b { background-color: {% if current_day == 'Thursday' %}pink{% else %}white{% endif %}; }
-        body, button, input {
-            font-size: 20px;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="static/styles.css">
 </head>
 <body>
 <div class="container">
@@ -41,13 +25,16 @@
     </div>
 </div>
 
-<div class="clearfix"></div>
-<button id="redrawTeams">Losuj ponownie</button>
-<br>
-<button onclick="location.href='/'">Powrót do Strony Głównej</button>
+<div class="przyciski">
+
+    <button class="button-19" id="redrawTeams">Losuj ponownie</button>
+    <br><br>
+    <button class="button-19" onclick="location.href='/'">Powrót do Strony Głównej</button>
+
+</div>
 <script>
     document.getElementById('redrawTeams').addEventListener('click', function() {
-    console.log("Przycisk Losuj został kliknięty.");
+<!--    console.log("Przycisk Losuj został kliknięty.");-->
         window.location.href = '/losuj';
     });
 </script>
