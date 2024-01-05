@@ -96,7 +96,7 @@ body, button, input {
         .player-on-break {
             background-color: lightblue;
         }
-        
+
         input[type="checkbox"] {
             width: 30px;  /* szerokość checkboxa */
             height: 30px; /* wysokość checkboxa */
@@ -118,3 +118,7 @@ body, button, input {
             font-weight: bold;
             font-weight: 800;
         }
+        .info-input {
+    width: 100%;
+    box-sizing: border-box; /* Opcjonalnie, zapewnia, że padding i border nie rozszerzą inputa poza 100% szerokości */
+}
