@@ -61,8 +61,10 @@ def update_status():
         if player["name"] == data["name"]:
             player["is_present"] = data["is_present"]
             player["on_break"] = data["on_break"]
+            player["info"] = data["info"]  # Aktualizacja pola info
     save_data(players)
     return jsonify(success=True)
+
 
 # Endpoint do losowania drużyn
 @app.route('/draw_teams')

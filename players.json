@@ -7,7 +7,8 @@
         "gra_zespolowa": 9,
         "uderzenie": 8,
         "is_present": false,
-        "on_break": false
+        "on_break": false,
+        "info": "Kierownik b\u0119bna"
     },
     {
         "id": 2,
@@ -17,7 +18,8 @@
         "gra_zespolowa": 7,
         "uderzenie": 7,
         "is_present": false,
-        "on_break": false
+        "on_break": false,
+        "info": ""
     },
     {
         "id": 3,
@@ -27,7 +29,8 @@
         "gra_zespolowa": 7,
         "uderzenie": 8,
         "is_present": false,
-        "on_break": false
+        "on_break": false,
+        "info": ""
     },
     {
         "id": 4,
@@ -37,7 +40,8 @@
         "gra_zespolowa": 8,
         "uderzenie": 9,
         "is_present": false,
-        "on_break": false
+        "on_break": false,
+        "info": ""
     },
     {
         "id": 5,
@@ -47,7 +51,8 @@
         "gra_zespolowa": 9,
         "uderzenie": 8,
         "is_present": true,
-        "on_break": false
+        "on_break": false,
+        "info": ""
     },
     {
         "id": 6,
@@ -57,7 +62,8 @@
         "gra_zespolowa": 8,
         "uderzenie": 6,
         "is_present": true,
-        "on_break": false
+        "on_break": false,
+        "info": ""
     },
     {
         "id": 7,
@@ -67,7 +73,8 @@
         "gra_zespolowa": 8,
         "uderzenie": 8,
         "is_present": false,
-        "on_break": false
+        "on_break": false,
+        "info": ""
     },
     {
         "id": 8,
@@ -77,7 +84,8 @@
         "gra_zespolowa": 9,
         "uderzenie": 9,
         "is_present": false,
-        "on_break": false
+        "on_break": false,
+        "info": ""
     },
     {
         "id": 9,
@@ -87,7 +95,8 @@
         "gra_zespolowa": 8,
         "uderzenie": 8,
         "is_present": true,
-        "on_break": false
+        "on_break": false,
+        "info": ""
     },
     {
         "id": 10,
@@ -97,7 +106,8 @@
         "gra_zespolowa": 9,
         "uderzenie": 8,
         "is_present": true,
-        "on_break": false
+        "on_break": false,
+        "info": ""
     },
     {
         "id": 11,
@@ -107,7 +117,8 @@
         "gra_zespolowa": 8,
         "uderzenie": 8,
         "is_present": false,
-        "on_break": false
+        "on_break": false,
+        "info": ""
     },
     {
         "id": 12,
@@ -117,7 +128,8 @@
         "gra_zespolowa": 8,
         "uderzenie": 8,
         "is_present": false,
-        "on_break": true
+        "on_break": true,
+        "info": ""
     },
     {
         "id": 13,
@@ -127,7 +139,8 @@
         "gra_zespolowa": 9,
         "uderzenie": 8,
         "is_present": true,
-        "on_break": false
+        "on_break": false,
+        "info": ""
     },
     {
         "id": 14,
@@ -137,7 +150,8 @@
         "gra_zespolowa": 8,
         "uderzenie": 8,
         "is_present": true,
-        "on_break": false
+        "on_break": false,
+        "info": ""
     },
     {
         "id": 15,
@@ -147,7 +161,8 @@
         "gra_zespolowa": 8,
         "uderzenie": 8,
         "is_present": false,
-        "on_break": false
+        "on_break": false,
+        "info": ""
     },
     {
         "id": 16,
@@ -157,7 +172,8 @@
         "gra_zespolowa": 9,
         "uderzenie": 9,
         "is_present": true,
-        "on_break": false
+        "on_break": false,
+        "info": ""
     },
     {
         "id": 17,
@@ -167,7 +183,8 @@
         "gra_zespolowa": 8,
         "uderzenie": 8,
         "is_present": true,
-        "on_break": false
+        "on_break": false,
+        "info": ""
     },
     {
         "id": 18,
@@ -177,7 +194,8 @@
         "gra_zespolowa": 8,
         "uderzenie": 9,
         "is_present": false,
-        "on_break": false
+        "on_break": false,
+        "info": ""
     },
     {
         "id": 19,
@@ -187,6 +205,7 @@
         "gra_zespolowa": 9,
         "uderzenie": 8,
         "is_present": false,
-        "on_break": false
+        "on_break": false,
+        "info": ""
     }
 ]

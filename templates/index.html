@@ -30,12 +30,14 @@
             <th>Zawodnik</th>
             <th>Obecny</th>
             <th>Przerwa</th>
+            <th>Info</th>
         </tr>
         {% for player in players %}
         <tr class="player-row" id="row-{{ player.name }}">
             <td>{{ player.name }}</td>
             <td><input type="checkbox" class="present-checkbox" data-name="{{ player.name }}" {% if player.is_present %} checked {% endif %}></td>
             <td><input type="checkbox" class="break-checkbox" data-name="{{ player.name }}" {% if player.on_break %} checked {% endif %}></td>
+            <td><input type="text" class="info-input" data-name="{{ player.name }}" value="{{ player.info }}"></td>
         </tr>
         {% endfor %}
     </table>
@@ -83,6 +85,29 @@
             $('#drawTeams').click(function() {
     $.get('/draw_teams', function(data) {
         window.location.href = '/draw_teams'; // Przekierowanie do strony z wynikami losowania
+    });
+});
+
+
+$('.info-input').change(function() {
+    var playerName = $(this).data('name');
+    var infoValue = $(this).val();
+    var presentCheckbox = $('#row-' + playerName + ' .present-checkbox').is(':checked');
+    var breakCheckbox = $('#row-' + playerName + ' .break-checkbox').is(':checked');
+
+    $.ajax({
+        url: '/update_status',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            name: playerName,
+            is_present: presentCheckbox,
+            on_break: breakCheckbox,
+            info: infoValue
+        }),
+        success: function(response) {
+            console.log('Informacje zaktualizowane');
+        }
     });
 });
 
