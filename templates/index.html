@@ -9,151 +9,156 @@
 <body>
 <div><p>Liczba zawodników: <span id="presentCount">0</span></p></div>
 
-    <table id="playersTable">
-        <tr>
-            <th>Zawodnik</th>
-            <th>Obecny</th>
-            <th>Nieobecny</th>
-            <th>Info</th>
-        </tr>
-        {% for player in players %}
-        <tr class="player-row" id="row-{{ player.name }}">
-            <td>{{ player.name }}</td>
-            <td><input type="checkbox" class="present-checkbox" data-name="{{ player.name }}" {% if player.is_present %} checked {% endif %}></td>
-            <td><input type="checkbox" class="break-checkbox" data-name="{{ player.name }}" {% if player.on_break %} checked {% endif %}></td>
-            <td><input type="text" class="info-input" data-name="{{ player.name }}" value="{{ player.info }}"></td>
-        </tr>
-        {% endfor %}
-    </table>
+<table id="playersTable">
+    <tr>
+        <th class="narrow-column">Zawodnik</th>
+        <th class="narrow-column">Obecny</th>
+        <th class="narrow-column">Nieobecny</th>
+        <th>Info</th>
+    </tr>
+    {% for player in players %}
+    <tr class="player-row" id="row-{{ player.name }}">
+        <td>{{ player.name }}</td>
+        <td style="text-align: center; vertical-align: middle;"><input type="checkbox" class="present-checkbox" data-name="{{ player.name }}" {% if player.is_present %}
+                   checked {% endif %}></td>
+        <td style="text-align: center; vertical-align: middle;"><input type="checkbox" class="break-checkbox" data-name="{{ player.name }}" {% if player.on_break %} checked
+                   {% endif %}></td>
+        <td><input type="text" class="info-input" data-name="{{ player.name }}" value="{{ player.info }}"></td>
+    </tr>
+    {% endfor %}
+</table>
 
-<!--    <button id="drawTeams">Losuj Drużyny</button>-->
-    <br><button class="button-19" id="clearSelection">WYCZYŚĆ - gdy chesz zacząć nową rozrgrywkę</button>
 
-    <script>
-        $(document).ready(function() {
+<br>
+<button class="button-19" id="clearSelection">WYCZYŚĆ - gdy chesz zacząć nową rozrgrywkę</button>
+<br><br><br>
+<button class="button-20" id="drawTeams">Losuj Drużyny</button>
+<br><br><br><br>
+<script>
+    $(document).ready(function() {
+        updatePlayerRowStyles();
+        updatePresentCount()
+        $('.present-checkbox').change(function() {
             updatePlayerRowStyles();
-            updatePresentCount()
-            $('.present-checkbox').change(function() {
-                updatePlayerRowStyles();
-                var playerName = $(this).data('name');
-                var isPresent = $(this).is(':checked');
-                var row = $('#row-' + playerName);
-                var breakCheckbox = row.find('.break-checkbox');
+            var playerName = $(this).data('name');
+            var isPresent = $(this).is(':checked');
+            var row = $('#row-' + playerName);
+            var breakCheckbox = row.find('.break-checkbox');
 
-                updatePlayerStatus(playerName, isPresent, breakCheckbox.is(':checked'));
-                breakCheckbox.prop('disabled', isPresent);
-                if (isPresent) {
-                    row.addClass('player-present').removeClass('player-on-break');
-                    breakCheckbox.prop('checked', false);
-                } else {
-                    row.removeClass('player-present');
-                }
-                updatePresentCount();  // Aktualizacja licznika
-            });
+            updatePlayerStatus(playerName, isPresent, breakCheckbox.is(':checked'));
+            breakCheckbox.prop('disabled', isPresent);
+            if (isPresent) {
+                row.addClass('player-present').removeClass('player-on-break');
+                breakCheckbox.prop('checked', false);
+            } else {
+                row.removeClass('player-present');
+            }
+            updatePresentCount();  // Aktualizacja licznika
+        });
 
-            $('.break-checkbox').change(function() {
-                var playerName = $(this).data('name');
-                var onBreak = $(this).is(':checked');
-                var row = $('#row-' + playerName);
-                var presentCheckbox = row.find('.present-checkbox');
+        $('.break-checkbox').change(function() {
+            var playerName = $(this).data('name');
+            var onBreak = $(this).is(':checked');
+            var row = $('#row-' + playerName);
+            var presentCheckbox = row.find('.present-checkbox');
 
-                updatePlayerStatus(playerName, false, onBreak);
-                presentCheckbox.prop('checked', false).prop('disabled', onBreak);
-                if (onBreak) {
-                    row.addClass('player-on-break').removeClass('player-present');
-                } else {
-                    row.removeClass('player-on-break');
-                }
-                updatePresentCount();  // Aktualizacja licznika
-            });
+            updatePlayerStatus(playerName, false, onBreak);
+            presentCheckbox.prop('checked', false).prop('disabled', onBreak);
+            if (onBreak) {
+                row.addClass('player-on-break').removeClass('player-present');
+            } else {
+                row.removeClass('player-on-break');
+            }
+            updatePresentCount();  // Aktualizacja licznika
+        });
 
-            $('#drawTeams').click(function() {
-    $.get('/losuj', function(data) {
-        window.location.href = '/losuj'; // Przekierowanie do strony z wynikami losowania
-    });
+        $('#drawTeams').click(function() {
+$.get('/losuj', function(data) {
+    window.location.href = '/losuj'; // Przekierowanie do strony z wynikami losowania
+});
 });
 
 
 $('.info-input').change(function() {
-    var playerName = $(this).data('name');
-    var infoValue = $(this).val();
-    console.log("Wysyłanie danych:", playerName, infoValue);  // Dodaj tę linię
-    var presentCheckbox = $('#row-' + playerName + ' .present-checkbox').is(':checked');
-    var breakCheckbox = $('#row-' + playerName + ' .break-checkbox').is(':checked');
+var playerName = $(this).data('name');
+var infoValue = $(this).val();
+console.log("Wysyłanie danych:", playerName, infoValue);  // Dodaj tę linię
+var presentCheckbox = $('#row-' + playerName + ' .present-checkbox').is(':checked');
+var breakCheckbox = $('#row-' + playerName + ' .break-checkbox').is(':checked');
 
-    $.ajax({
-        url: '/update_status',
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({
-            name: playerName,
-            is_present: presentCheckbox,
-            on_break: breakCheckbox,
-            info: infoValue
-        }),
-        success: function(response) {
-            console.log('Informacje zaktualizowane');
-        }
-    });
+$.ajax({
+    url: '/update_status',
+    method: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify({
+        name: playerName,
+        is_present: presentCheckbox,
+        on_break: breakCheckbox,
+        info: infoValue
+    }),
+    success: function(response) {
+        console.log('Informacje zaktualizowane');
+    }
+});
 });
 
 
-            $('#clearSelection').click(function() {
-    $('.present-checkbox, .break-checkbox').prop('checked', false);
-    $('.present-checkbox, .break-checkbox').prop('disabled', false);
-    updatePlayerRowStyles();
+        $('#clearSelection').click(function() {
+$('.present-checkbox, .break-checkbox').prop('checked', false);
+$('.present-checkbox, .break-checkbox').prop('disabled', false);
+updatePlayerRowStyles();
 
-    // Wysyłanie żądania do serwera Flask, aby zaktualizować plik JSON
-    $.ajax({
-        url: '/clear_selection',
-        method: 'POST',
-        success: function(response) {
-            console.log('Checkboxy zostały wyczyszczone');
-        },
-        error: function() {
-            console.log('Wystąpił błąd przy czyszczeniu checkboxów');
-        }
-    });
+// Wysyłanie żądania do serwera Flask, aby zaktualizować plik JSON
+$.ajax({
+    url: '/clear_selection',
+    method: 'POST',
+    success: function(response) {
+        console.log('Checkboxy zostały wyczyszczone');
+    },
+    error: function() {
+        console.log('Wystąpił błąd przy czyszczeniu checkboxów');
+    }
+});
 });
 
 
-            function updatePlayerRowStyles() {
-            $('.player-row').each(function() {
-                var presentCheckbox = $(this).find('.present-checkbox');
-                var breakCheckbox = $(this).find('.break-checkbox');
+        function updatePlayerRowStyles() {
+        $('.player-row').each(function() {
+            var presentCheckbox = $(this).find('.present-checkbox');
+            var breakCheckbox = $(this).find('.break-checkbox');
 
-                if (presentCheckbox.is(':checked')) {
-                    $(this).addClass('player-present').removeClass('player-on-break');
-                } else if (breakCheckbox.is(':checked')) {
-                    $(this).addClass('player-on-break').removeClass('player-present');
-                } else {
-                    $(this).removeClass('player-present player-on-break');
+            if (presentCheckbox.is(':checked')) {
+                $(this).addClass('player-present').removeClass('player-on-break');
+            } else if (breakCheckbox.is(':checked')) {
+                $(this).addClass('player-on-break').removeClass('player-present');
+            } else {
+                $(this).removeClass('player-present player-on-break');
+            }
+        });
+    }
+
+
+        function updatePresentCount() {
+var count = $('.present-checkbox:checked').length;
+$('#presentCount').text(count);
+}
+
+        function updatePlayerStatus(name, isPresent, onBreak) {
+            $.ajax({
+                url: '/update_status',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    name: name,
+                    is_present: isPresent,
+                    on_break: onBreak
+                }),
+                success: function(response) {
+                    // Możesz dodać tutaj logikę obsługi odpowiedzi
                 }
             });
         }
-
-
-            function updatePresentCount() {
-    var count = $('.present-checkbox:checked').length;
-    $('#presentCount').text(count);
-}
-
-            function updatePlayerStatus(name, isPresent, onBreak) {
-                $.ajax({
-                    url: '/update_status',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({
-                        name: name,
-                        is_present: isPresent,
-                        on_break: onBreak
-                    }),
-                    success: function(response) {
-                        // Możesz dodać tutaj logikę obsługi odpowiedzi
-                    }
-                });
-            }
-        });
-    </script>
+    });
+</script>
 </body>
 </html>

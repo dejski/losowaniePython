@@ -7,7 +7,7 @@
         "gra_zespolowa": 9,
         "uderzenie": 8,
         "is_present": false,
-        "on_break": false,
+        "on_break": true,
         "info": "3"
     },
     {
@@ -18,7 +18,7 @@
         "gra_zespolowa": 7,
         "uderzenie": 7,
         "is_present": false,
-        "on_break": false,
+        "on_break": true,
         "info": "5"
     },
     {
@@ -62,7 +62,7 @@
         "gra_zespolowa": 8,
         "uderzenie": 6,
         "is_present": false,
-        "on_break": false,
+        "on_break": true,
         "info": ""
     },
     {
@@ -105,7 +105,7 @@
         "technika": 9,
         "gra_zespolowa": 9,
         "uderzenie": 8,
-        "is_present": false,
+        "is_present": true,
         "on_break": false,
         "info": ""
     },
@@ -117,7 +117,7 @@
         "gra_zespolowa": 8,
         "uderzenie": 8,
         "is_present": false,
-        "on_break": false,
+        "on_break": true,
         "info": ""
     },
     {
@@ -149,7 +149,7 @@
         "technika": 8,
         "gra_zespolowa": 8,
         "uderzenie": 8,
-        "is_present": false,
+        "is_present": true,
         "on_break": false,
         "info": ""
     },
@@ -171,7 +171,7 @@
         "technika": 10,
         "gra_zespolowa": 9,
         "uderzenie": 9,
-        "is_present": false,
+        "is_present": true,
         "on_break": false,
         "info": ""
     },
@@ -205,7 +205,7 @@
         "gra_zespolowa": 9,
         "uderzenie": 8,
         "is_present": false,
-        "on_break": false,
+        "on_break": true,
         "info": ""
     }
 ]

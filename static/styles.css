@@ -104,12 +104,12 @@ body, button, input {
         }
         table {
             border-collapse: collapse; /* Usuwa podwójne ramki */
-            width: 70%; /* Opcjonalnie, rozciąga tabelę na całą dostępną szerokość */
+            width: 60%; /* Opcjonalnie, rozciąga tabelę na całą dostępną szerokość */
         }
         th, td {
             border: 1px solid black; /* Czarna ramka dla komórek tabeli */
             text-align: left; /* Wyrównanie tekstu do lewej */
-            padding: 8px; /* Dodaje padding do komórek */
+            padding: 6px; /* Dodaje padding do komórek */
         }
         th {
             background-color: #D3D3D3; /* Szare tło dla nagłówków */
@@ -121,4 +121,43 @@ body, button, input {
         .info-input {
     width: 100%;
     box-sizing: border-box; /* Opcjonalnie, zapewnia, że padding i border nie rozszerzą inputa poza 100% szerokości */
+}
+
+.button-20 {
+  appearance: button;
+  background-color: white;
+  border: solid transparent;
+  border-radius: 16px;
+  border-width: 0 0 4px;
+  box-sizing: border-box;
+  color: white;
+  cursor: pointer;
+  display: inline-block;
+  font-family: din-round,sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .8px;
+  line-height: 20px;
+  margin-left: 200;
+  outline: none;
+  overflow: visible;
+  padding: 13px 16px;
+  text-align: center;
+  text-transform: uppercase;
+  touch-action: manipulation;
+  transform: translateZ(0);
+  transition: filter .2s;
+  user-select: none;
+  -webkit-user-select: none;
+  vertical-align: middle;
+  white-space: nowrap;
+  width: 100;
+  position: absolute;
+
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+}
+.narrow-column {
+    width: 150px; /* Możesz dostosować szerokość według potrzeb */
 }
