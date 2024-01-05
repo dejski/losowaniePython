@@ -4,39 +4,42 @@
     <meta charset="UTF-8">
     <title>Wylosowane Drużyny</title>
     <style>
-        .team-column {
-            float: left;
-            width: 50%;
+        .container {
+            display: flex;
+            justify-content: center;
         }
-        .team-a {
-            background-color: {% if current_day == 'Tuesday' %} pink {% else %} white {% endif %};
+        .column {
+            margin: 10px;
+            padding: 20px;
+            border: 1px solid black;
+            border-radius: 5px;
         }
-        .team-b {
-            background-color: {% if current_day == 'Friday' %} pink {% else %} white {% endif %};
-        }
-        .clearfix {
-            clear: both;
+        .team-a { background-color: {% if current_day == 'Tuesday' %}pink{% else %}white{% endif %}; }
+        .team-b { background-color: {% if current_day == 'Friday' %}pink{% else %}white{% endif %}; }
+        body, button, input {
+            font-size: 20px;
         }
     </style>
 </head>
 <body>
-<div class="team-column team-a">
-    <h2>Drużyna A (Suma cech: {{ sum_a }})</h2>
-    <ul>
-        {% for player in team_a %}
-        <li>{{ player.name }}</li>
-        {% endfor %}
-    </ul>
-</div>
-
-<div class="team-column team-b">
-    <h2>Drużyna B (Suma cech: {{ sum_b }})</h2>
-    <ul>
-        {% for player in team_b %}
-        <li>{{ player.name }}</li>
-        {% endfor %}
-    </ul>
-</div>
+<<div class="container">
+        <div class="column team-a">
+            <h1>Drużyna A ({{ sum_a }})</h1>
+            <ul>
+                {% for player in team_a %}
+                    <li>{{ player['name'] }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="column team-b">
+            <h1>Drużyna B ({{ sum_b }})</h1>
+            <ul>
+                {% for player in team_b %}
+                    <li>{{ player['name'] }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
 
 <div class="clearfix"></div>
 <button id="redrawTeams">Losuj ponownie</button>

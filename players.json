@@ -83,8 +83,8 @@
         "technika": 9,
         "gra_zespolowa": 9,
         "uderzenie": 9,
-        "is_present": false,
-        "on_break": true,
+        "is_present": true,
+        "on_break": false,
         "info": "Nieobecny do 9.I"
     },
     {
@@ -160,8 +160,8 @@
         "technika": 8,
         "gra_zespolowa": 8,
         "uderzenie": 8,
-        "is_present": true,
-        "on_break": false,
+        "is_present": false,
+        "on_break": true,
         "info": ""
     },
     {
@@ -171,8 +171,8 @@
         "technika": 10,
         "gra_zespolowa": 9,
         "uderzenie": 9,
-        "is_present": false,
-        "on_break": true,
+        "is_present": true,
+        "on_break": false,
         "info": ""
     },
     {
