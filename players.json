@@ -6,9 +6,9 @@
         "technika": 8,
         "gra_zespolowa": 9,
         "uderzenie": 8,
-        "is_present": true,
+        "is_present": false,
         "on_break": false,
-        "info": ""
+        "info": "1"
     },
     {
         "id": 2,
@@ -17,9 +17,9 @@
         "technika": 6,
         "gra_zespolowa": 7,
         "uderzenie": 7,
-        "is_present": true,
+        "is_present": false,
         "on_break": false,
-        "info": ""
+        "info": "1"
     },
     {
         "id": 3,
@@ -28,7 +28,7 @@
         "technika": 6,
         "gra_zespolowa": 7,
         "uderzenie": 8,
-        "is_present": true,
+        "is_present": false,
         "on_break": false,
         "info": ""
     },
@@ -39,7 +39,7 @@
         "technika": 8,
         "gra_zespolowa": 8,
         "uderzenie": 9,
-        "is_present": true,
+        "is_present": false,
         "on_break": false,
         "info": ""
     },
@@ -50,7 +50,7 @@
         "technika": 8,
         "gra_zespolowa": 9,
         "uderzenie": 8,
-        "is_present": true,
+        "is_present": false,
         "on_break": false,
         "info": ""
     },
@@ -62,7 +62,7 @@
         "gra_zespolowa": 8,
         "uderzenie": 6,
         "is_present": false,
-        "on_break": true,
+        "on_break": false,
         "info": ""
     },
     {
@@ -73,8 +73,8 @@
         "gra_zespolowa": 8,
         "uderzenie": 8,
         "is_present": false,
-        "on_break": true,
-        "info": ""
+        "on_break": false,
+        "info": "1"
     },
     {
         "id": 8,
@@ -83,9 +83,9 @@
         "technika": 9,
         "gra_zespolowa": 9,
         "uderzenie": 9,
-        "is_present": true,
+        "is_present": false,
         "on_break": false,
-        "info": "Nieobecny do 9.I"
+        "info": ""
     },
     {
         "id": 9,
@@ -94,9 +94,9 @@
         "technika": 8,
         "gra_zespolowa": 8,
         "uderzenie": 8,
-        "is_present": true,
+        "is_present": false,
         "on_break": false,
-        "info": ""
+        "info": "1111"
     },
     {
         "id": 10,
@@ -105,7 +105,7 @@
         "technika": 9,
         "gra_zespolowa": 9,
         "uderzenie": 8,
-        "is_present": true,
+        "is_present": false,
         "on_break": false,
         "info": ""
     },
@@ -117,7 +117,7 @@
         "gra_zespolowa": 8,
         "uderzenie": 8,
         "is_present": false,
-        "on_break": true,
+        "on_break": false,
         "info": ""
     },
     {
@@ -128,7 +128,7 @@
         "gra_zespolowa": 8,
         "uderzenie": 8,
         "is_present": false,
-        "on_break": true,
+        "on_break": false,
         "info": ""
     },
     {
@@ -139,7 +139,7 @@
         "gra_zespolowa": 9,
         "uderzenie": 8,
         "is_present": false,
-        "on_break": true,
+        "on_break": false,
         "info": ""
     },
     {
@@ -149,7 +149,7 @@
         "technika": 8,
         "gra_zespolowa": 8,
         "uderzenie": 8,
-        "is_present": true,
+        "is_present": false,
         "on_break": false,
         "info": ""
     },
@@ -161,7 +161,7 @@
         "gra_zespolowa": 8,
         "uderzenie": 8,
         "is_present": false,
-        "on_break": true,
+        "on_break": false,
         "info": ""
     },
     {
@@ -171,7 +171,7 @@
         "technika": 10,
         "gra_zespolowa": 9,
         "uderzenie": 9,
-        "is_present": true,
+        "is_present": false,
         "on_break": false,
         "info": ""
     },
@@ -182,9 +182,9 @@
         "technika": 8,
         "gra_zespolowa": 8,
         "uderzenie": 8,
-        "is_present": true,
+        "is_present": false,
         "on_break": false,
-        "info": ""
+        "info": "Nadzorca "
     },
     {
         "id": 18,
@@ -193,9 +193,9 @@
         "technika": 8,
         "gra_zespolowa": 8,
         "uderzenie": 9,
-        "is_present": true,
+        "is_present": false,
         "on_break": false,
-        "info": "Nadzorca b\u0119bna!!"
+        "info": ""
     },
     {
         "id": 19,
@@ -205,7 +205,7 @@
         "gra_zespolowa": 9,
         "uderzenie": 8,
         "is_present": false,
-        "on_break": true,
+        "on_break": false,
         "info": ""
     }
 ]

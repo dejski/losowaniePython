@@ -81,12 +81,14 @@ def index():
 @app.route('/update_status', methods=['POST'])
 def update_status():
     data = request.json
+    # print("Otrzymane dane:", data)  # Dodaj tę linię do logowania
     players = load_data()
     for player in players:
         if player["name"] == data["name"]:
             player["is_present"] = data["is_present"]
             player["on_break"] = data["on_break"]
-            player["info"] = data.get("info", "")  # Bezpieczne pobieranie 'info'
+            if "info" in data:  # Sprawdź, czy pole 'info' istnieje w danych
+                player["info"] = data["info"]
     save_data(players)
     return jsonify(success=True)
 

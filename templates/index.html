@@ -6,6 +6,7 @@
     <style>
         body, button, input {
             font-size: 25px;
+            font-family: Arial;
         }
         .player-row {
             background-color: white;
@@ -39,17 +40,21 @@
         th {
             background-color: #D3D3D3; /* Szare tło dla nagłówków */
         }
+        p {
+            font-weight: bold;
+            font-weight: 800;
+        }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
-<div>Liczba obecnych zawodników: <span id="presentCount">0</span></div>
+<div><p>Liczba zawodników: <span id="presentCount">0</span></p></div>
 
     <table id="playersTable">
         <tr>
             <th>Zawodnik</th>
             <th>Obecny</th>
-            <th>Przerwa</th>
+            <th>Nieobecny</th>
             <th>Info</th>
         </tr>
         {% for player in players %}
@@ -63,7 +68,7 @@
     </table>
 
 <!--    <button id="drawTeams">Losuj Drużyny</button>-->
-    <button id="clearSelection">Wyczyść</button>
+    <br><button id="clearSelection">WYCZYŚĆ - gdy chesz zacząć nową rozrgrywkę</button>
 
     <script>
         $(document).ready(function() {
@@ -113,6 +118,7 @@
 $('.info-input').change(function() {
     var playerName = $(this).data('name');
     var infoValue = $(this).val();
+    console.log("Wysyłanie danych:", playerName, infoValue);  // Dodaj tę linię
     var presentCheckbox = $('#row-' + playerName + ' .present-checkbox').is(':checked');
     var breakCheckbox = $('#row-' + playerName + ' .break-checkbox').is(':checked');
 
