@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Zawodnicy</title>
+    <style>
+        .player-row {
+            background-color: white;
+        }
+        .player-present {
+            background-color: lightgreen;
+        }
+        .player-on-break {
+            background-color: lightblue;
+        }
+        .team-a {
+            background-color: pink;
+        }
+        .team-b {
+            background-color: pink;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+<div>Liczba obecnych zawodników: <span id="presentCount">0</span></div>
+
+    <table id="playersTable">
+        <tr>
+            <th>Zawodnik</th>
+            <th>Obecny</th>
+            <th>Przerwa</th>
+        </tr>
+        {% for player in players %}
+        <tr class="player-row" id="row-{{ player.name }}">
+            <td>{{ player.name }}</td>
+            <td><input type="checkbox" class="present-checkbox" data-name="{{ player.name }}" {% if player.is_present %} checked {% endif %}></td>
+            <td><input type="checkbox" class="break-checkbox" data-name="{{ player.name }}" {% if player.on_break %} checked {% endif %}></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <button id="drawTeams">Losuj Drużyny</button>
+    <button id="clearSelection">Wyczyść</button>
+
+    <script>
+        $(document).ready(function() {
+            updatePlayerRowStyles();
+            $('.present-checkbox').change(function() {
+                updatePlayerRowStyles();
+                var playerName = $(this).data('name');
+                var isPresent = $(this).is(':checked');
+                var row = $('#row-' + playerName);
+                var breakCheckbox = row.find('.break-checkbox');
+
+                updatePlayerStatus(playerName, isPresent, breakCheckbox.is(':checked'));
+                breakCheckbox.prop('disabled', isPresent);
+                if (isPresent) {
+                    row.addClass('player-present').removeClass('player-on-break');
+                    breakCheckbox.prop('checked', false);
+                } else {
+                    row.removeClass('player-present');
+                }
+                updatePresentCount();  // Aktualizacja licznika
+            });
+
+            $('.break-checkbox').change(function() {
+                var playerName = $(this).data('name');
+                var onBreak = $(this).is(':checked');
+                var row = $('#row-' + playerName);
+                var presentCheckbox = row.find('.present-checkbox');
+
+                updatePlayerStatus(playerName, false, onBreak);
+                presentCheckbox.prop('checked', false).prop('disabled', onBreak);
+                if (onBreak) {
+                    row.addClass('player-on-break').removeClass('player-present');
+                } else {
+                    row.removeClass('player-on-break');
+                }
+                updatePresentCount();  // Aktualizacja licznika
+            });
+
+            $('#drawTeams').click(function() {
+    $.get('/draw_teams', function(data) {
+        window.location.href = '/draw_teams'; // Przekierowanie do strony z wynikami losowania
+    });
+});
+
+
+            $('#clearSelection').click(function() {
+                $('.present-checkbox, .break-checkbox').prop('checked', false).prop('disabled', false);
+                $('.player-row').removeClass('player-present player-on-break');
+                // Update backend
+                // ...
+            });
+
+
+            function updatePlayerRowStyles() {
+            $('.player-row').each(function() {
+                var presentCheckbox = $(this).find('.present-checkbox');
+                var breakCheckbox = $(this).find('.break-checkbox');
+
+                if (presentCheckbox.is(':checked')) {
+                    $(this).addClass('player-present').removeClass('player-on-break');
+                } else if (breakCheckbox.is(':checked')) {
+                    $(this).addClass('player-on-break').removeClass('player-present');
+                } else {
+                    $(this).removeClass('player-present player-on-break');
+                }
+            });
+        }
+
+
+            function updatePresentCount() {
+    var count = $('.present-checkbox:checked').length;
+    $('#presentCount').text(count);
+}
+
+            function updatePlayerStatus(name, isPresent, onBreak) {
+                $.ajax({
+                    url: '/update_status',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        name: name,
+                        is_present: isPresent,
+                        on_break: onBreak
+                    }),
+                    success: function(response) {
+                        // Możesz dodać tutaj logikę obsługi odpowiedzi
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

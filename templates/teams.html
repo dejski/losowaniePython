@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wylosowane Drużyny</title>
+    <style>
+        .team-column {
+            float: left;
+            width: 50%;
+        }
+        .team-a {
+            background-color: {% if current_day == 'Tuesday' %} pink {% else %} white {% endif %};
+        }
+        .team-b {
+            background-color: {% if current_day == 'Friday' %} pink {% else %} white {% endif %};
+        }
+        .clearfix {
+            clear: both;
+        }
+    </style>
+</head>
+<body>
+<div class="team-column team-a">
+    <h2>Drużyna A (Suma cech: {{ sum_a }})</h2>
+    <ul>
+        {% for player in team_a %}
+        <li>{{ player.name }}</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div class="team-column team-b">
+    <h2>Drużyna B (Suma cech: {{ sum_b }})</h2>
+    <ul>
+        {% for player in team_b %}
+        <li>{{ player.name }}</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div class="clearfix"></div>
+<button id="redrawTeams">Losuj ponownie</button>
+<br>
+<button onclick="location.href='/'">Powrót do Strony Głównej</button>
+<script>
+    document.getElementById('redrawTeams').addEventListener('click', function() {
+    console.log("Przycisk Losuj został kliknięty.");
+        window.location.href = '/draw_teams';
+    });
+</script>
+</script>
+</body>
+</html>
