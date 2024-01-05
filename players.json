@@ -8,7 +8,7 @@
         "uderzenie": 8,
         "is_present": false,
         "on_break": false,
-        "info": "Kierownik b\u0119bna"
+        "info": ""
     },
     {
         "id": 2,
@@ -85,7 +85,7 @@
         "uderzenie": 9,
         "is_present": false,
         "on_break": false,
-        "info": ""
+        "info": "Nieobecny do 9.I"
     },
     {
         "id": 9,
@@ -184,7 +184,7 @@
         "uderzenie": 8,
         "is_present": true,
         "on_break": false,
-        "info": ""
+        "info": "Nadzorca b\u0119bna!!"
     },
     {
         "id": 18,
@@ -195,7 +195,7 @@
         "uderzenie": 9,
         "is_present": false,
         "on_break": false,
-        "info": ""
+        "info": "2222222"
     },
     {
         "id": 19,

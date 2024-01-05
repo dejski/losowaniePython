@@ -48,6 +48,7 @@
     <script>
         $(document).ready(function() {
             updatePlayerRowStyles();
+            updatePresentCount()
             $('.present-checkbox').change(function() {
                 updatePlayerRowStyles();
                 var playerName = $(this).data('name');

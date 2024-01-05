@@ -50,6 +50,7 @@ def draw_teams(players):
 @app.route('/')
 def index():
     players = load_data()
+    players.sort(key=lambda x: x['name'])
     return render_template('index.html', players=players)
 
 # Endpoint do aktualizacji stanu zawodnika
