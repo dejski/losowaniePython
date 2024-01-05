@@ -8,7 +8,7 @@
         "uderzenie": 8,
         "is_present": true,
         "on_break": false,
-        "info": "bbb"
+        "info": ""
     },
     {
         "id": 2,
@@ -19,7 +19,7 @@
         "uderzenie": 7,
         "is_present": true,
         "on_break": false,
-        "info": "b"
+        "info": ""
     },
     {
         "id": 3,
