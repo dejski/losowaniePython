@@ -9,7 +9,10 @@ app = Flask(__name__)
 # Załaduj dane z pliku JSON
 def load_data():
     with open("players.json", "r") as file:
-        return json.load(file)
+        players = json.load(file)
+        for player in players:
+            player.setdefault('info', '')  # Ustawia domyślną wartość, jeśli klucz 'info' nie istnieje
+        return players
 
 # Zapisz dane do pliku JSON
 def save_data(data):
@@ -62,7 +65,7 @@ def update_status():
         if player["name"] == data["name"]:
             player["is_present"] = data["is_present"]
             player["on_break"] = data["on_break"]
-            player["info"] = data["info"]  # Aktualizacja pola info
+            player["info"] = data.get("info", "")  # Bezpieczne pobieranie 'info'
     save_data(players)
     return jsonify(success=True)
 
