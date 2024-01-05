@@ -88,11 +88,21 @@
 
 
             $('#clearSelection').click(function() {
-                $('.present-checkbox, .break-checkbox').prop('checked', false).prop('disabled', false);
-                $('.player-row').removeClass('player-present player-on-break');
-                // Update backend
-                // ...
-            });
+    $('.present-checkbox, .break-checkbox').prop('checked', false);
+    updatePlayerRowStyles();
+
+    // Wysyłanie żądania do serwera Flask, aby zaktualizować plik JSON
+    $.ajax({
+        url: '/clear_selection',
+        method: 'POST',
+        success: function(response) {
+            console.log('Checkboxy zostały wyczyszczone');
+        },
+        error: function() {
+            console.log('Wystąpił błąd przy czyszczeniu checkboxów');
+        }
+    });
+});
 
 
             function updatePlayerRowStyles() {

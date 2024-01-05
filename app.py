@@ -73,6 +73,14 @@ def api_draw_teams():
     current_day = datetime.now().strftime('%A')
     return render_template('teams.html', team_a=team_a, team_b=team_b, sum_a=sum_a, sum_b=sum_b, current_day=current_day)
 
+@app.route('/clear_selection', methods=['POST'])
+def clear_selection():
+    players = load_data()
+    for player in players:
+        player['is_present'] = False
+        player['on_break'] = False
+    save_data(players)  # Funkcja zapisująca zmiany do pliku JSON
+    return jsonify({'success': True})
 
 
 
