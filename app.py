@@ -23,7 +23,7 @@ def save_data(data):
 def modify_total_attributes(player):
     attribute_keys = ['kondycja', 'technika', 'gra_zespolowa', 'uderzenie']
     total_attributes = sum(player.get(key, 0) for key in attribute_keys)
-    change_percent = random.uniform(-0.1, 0.1)
+    change_percent = random.uniform(-0.08, 0.08)
     return total_attributes * (1 + change_percent)
 
 # Losowanie drużyn
@@ -31,11 +31,11 @@ def draw_teams(players):
     for player in players:
         player['modified_total'] = modify_total_attributes(player)
 
-    # Sortowanie zawodników i dzielenie na drużyny
     sorted_players = sorted(players, key=lambda x: x['modified_total'], reverse=True)
     team_a, team_b = [], []
     sum_a, sum_b = 0, 0
 
+    # Rozdzielenie wszystkich graczy między drużyny
     for player in sorted_players:
         if sum_a <= sum_b:
             team_a.append(player)
@@ -44,10 +44,31 @@ def draw_teams(players):
             team_b.append(player)
             sum_b += player['modified_total']
 
-    sum_a = round(sum_a)
-    sum_b = round(sum_b)
+    # Jeśli liczba zawodników jest nieparzysta, dokonaj wymiany jeśli to konieczne
+    if len(players) % 2 != 0:
+        top_two_players = sorted_players[:2]
+        for top_player in top_two_players:
+            if (top_player in team_a and len(team_a) > len(team_b)) or (top_player in team_b and len(team_b) > len(team_a)):
+                # Wymiana gracza
+                team_with_top_player = team_a if top_player in team_a else team_b
+                team_to_swap_with = team_b if team_with_top_player == team_a else team_a
+                player_to_swap = min(team_to_swap_with, key=lambda x: x['modified_total'])
+                team_with_top_player, team_to_swap_with = swap_players(team_with_top_player, team_to_swap_with, top_player, player_to_swap)
 
-    return team_a, team_b, sum_a, sum_b
+    return team_a, team_b, round(sum_a), round(sum_b)
+
+def swap_players(team_with_top_player, team_to_swap_with, top_player, player_to_swap):
+    team_with_top_player.remove(top_player)
+    team_to_swap_with.append(top_player)
+    team_to_swap_with.remove(player_to_swap)
+    team_with_top_player.append(player_to_swap)
+    return team_with_top_player, team_to_swap_with
+
+
+
+
+
+
 
 # Strona główna
 @app.route('/')

@@ -22,24 +22,24 @@
     </style>
 </head>
 <body>
-<<div class="container">
-        <div class="column team-a">
-            <h1>Drużyna A ({{ sum_a }})</h1>
-            <ul>
-                {% for player in team_a %}
-                    <li>{{ player['name'] }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-        <div class="column team-b">
-            <h1>Drużyna B ({{ sum_b }})</h1>
-            <ul>
-                {% for player in team_b %}
-                    <li>{{ player['name'] }}</li>
-                {% endfor %}
-            </ul>
-        </div>
+<div class="container">
+    <div class="column team-a">
+        <h1>Drużyna A ({{ sum_a }})</h1>
+        <ul>
+            {% for player in team_a %}
+            <li>{{ player['name'] }}</li>
+            {% endfor %}
+        </ul>
     </div>
+    <div class="column team-b">
+        <h1>Drużyna B ({{ sum_b }})</h1>
+        <ul>
+            {% for player in team_b %}
+            <li>{{ player['name'] }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
 
 <div class="clearfix"></div>
 <button id="redrawTeams">Losuj ponownie</button>
@@ -50,7 +50,6 @@
     console.log("Przycisk Losuj został kliknięty.");
         window.location.href = '/draw_teams';
     });
-</script>
 </script>
 </body>
 </html>
