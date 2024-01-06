@@ -84,7 +84,7 @@
   background: none;
 }
 body, button, input {
-            font-size: 25px;
+            font-size: 22px;
             font-family: Arial;
         }
         .player-row {
@@ -98,8 +98,8 @@ body, button, input {
         }
 
         input[type="checkbox"] {
-            width: 30px;  /* szerokość checkboxa */
-            height: 30px; /* wysokość checkboxa */
+            width: 25px;  /* szerokość checkboxa */
+            height: 25px; /* wysokość checkboxa */
             cursor: pointer; /* opcjonalnie, zmienia kursor na wskaźnik */
         }
         table {
@@ -109,7 +109,7 @@ body, button, input {
         th, td {
             border: 1px solid black; /* Czarna ramka dla komórek tabeli */
             text-align: left; /* Wyrównanie tekstu do lewej */
-            padding: 6px; /* Dodaje padding do komórek */
+            padding: 2px; /* Dodaje padding do komórek */
         }
         th {
             background-color: #D3D3D3; /* Szare tło dla nagłówków */
@@ -160,4 +160,13 @@ body, button, input {
 }
 .narrow-column {
     width: 150px; /* Możesz dostosować szerokość według potrzeb */
+}
+.info-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    /* Możesz dodać dodatkowe style, takie jak marginesy, kolory tła itp. */
+    font-size: 25px;
+            font-family: Arial;
 }

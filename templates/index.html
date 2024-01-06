@@ -2,12 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Zawodnicy</title>
+    <title>Losowanie</title>
     <link rel="stylesheet" type="text/css" href="static/styles.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="shortcut icon" type="image/png" href="static/icon.png">
 </head>
 <body>
-<div><p>Liczba zawodników: <span id="presentCount">0</span></p></div>
+<div class="info-container">
+    <div class="players-count">
+        Liczba zawodników: <span id="presentCount">0</span>
+    </div>
+    <div class="next-match">
+        Najbliższy meczyk: <span id="nextMatchDate"></span>
+    </div>
+</div>
 
 <table id="playersTable">
     <tr>
@@ -19,10 +27,14 @@
     {% for player in players %}
     <tr class="player-row" id="row-{{ player.name }}">
         <td>{{ player.name }}</td>
-        <td style="text-align: center; vertical-align: middle;"><input type="checkbox" class="present-checkbox" data-name="{{ player.name }}" {% if player.is_present %}
-                   checked {% endif %}></td>
-        <td style="text-align: center; vertical-align: middle;"><input type="checkbox" class="break-checkbox" data-name="{{ player.name }}" {% if player.on_break %} checked
-                   {% endif %}></td>
+        <td style="text-align: center; vertical-align: middle;"><input type="checkbox" class="present-checkbox"
+                                                                       data-name="{{ player.name }}" {% if
+                                                                       player.is_present %}
+                                                                       checked {% endif %}></td>
+        <td style="text-align: center; vertical-align: middle;"><input type="checkbox" class="break-checkbox"
+                                                                       data-name="{{ player.name }}" {% if
+                                                                       player.on_break %} checked
+                                                                       {% endif %}></td>
         <td><input type="text" class="info-input" data-name="{{ player.name }}" value="{{ player.info }}"></td>
     </tr>
     {% endfor %}
@@ -38,6 +50,7 @@
     $(document).ready(function() {
         updatePlayerRowStyles();
         updatePresentCount()
+        $('#nextMatchDate').text(getNextMatchDate());
         $('.present-checkbox').change(function() {
             updatePlayerRowStyles();
             var playerName = $(this).data('name');
@@ -141,6 +154,7 @@ $.ajax({
         function updatePresentCount() {
 var count = $('.present-checkbox:checked').length;
 $('#presentCount').text(count);
+updatePlayerCountStyle(count)
 }
 
         function updatePlayerStatus(name, isPresent, onBreak) {
@@ -159,6 +173,52 @@ $('#presentCount').text(count);
             });
         }
     });
+
+
+    function getNextMatchDate() {
+    var today = new Date();
+    var nextMatch = new Date();
+    nextMatch.setHours(20, 0, 0, 0); // Ustawienie godziny na 20:00
+
+    // Ustalanie najbliższego dnia meczu (wtorek=2, czwartek=4)
+    if (today.getDay() <= 2) {
+        nextMatch.setDate(today.getDate() + (2 - today.getDay()));
+    } else if (today.getDay() <= 4) {
+        nextMatch.setDate(today.getDate() + (4 - today.getDay()));
+    } else {
+        nextMatch.setDate(today.getDate() + (9 - today.getDay())); // Następny wtorek
+    }
+
+    // Formatowanie daty
+    var options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+    return nextMatch.toLocaleString('pl-PL', options).replace(/\.|\/|\s/g, function(match) {
+        return match === ' ' ? ' ' : '.';
+    });
+}
+
+    function updatePlayerCountStyle(playerCount) {
+    var countElement = document.getElementById('presentCount');
+    countElement.textContent = playerCount;
+
+    // Resetowanie stylów
+    countElement.style.backgroundColor = '';
+
+    // Stosowanie odpowiednich stylów w zależności od liczby zawodników
+    if (playerCount < 10) {
+        countElement.style.backgroundColor = 'pink'; // Różowy
+    } else if (playerCount == 11) {
+        countElement.style.backgroundColor = 'yellow'; // Żółty
+    } else if (playerCount == 12 || playerCount == 10) {
+        countElement.style.backgroundColor = 'lightgreen'; // Zielony
+    } else if (playerCount == 13) {
+        countElement.style.backgroundColor = 'yellow'; // Żółty
+    } else if (playerCount == 14) {
+        countElement.style.backgroundColor = 'lightblue'; // Zielony
+    } else if (playerCount > 14) {
+        countElement.style.backgroundColor = 'red'; // Czerwony
+    }
+}
+
 </script>
 </body>
 </html>
