@@ -42,10 +42,11 @@
 
 
 <br>
-<button class="button-19" id="clearSelection">WYCZYŚĆ - gdy chesz zacząć nową rozrgrywkę</button>
-<br><br><br>
-<button class="button-20" id="drawTeams">Losuj Drużyny</button>
-<br><br><br><br>
+{% if show_draw_button %}
+<button class="button-19" id="drawTeams">LOSUJ</button>
+<br><br>
+<button class="button-19" id="clearSelection">WYCZYŚĆ</button>
+{% endif %}
 <script>
     $(document).ready(function() {
         updatePlayerRowStyles();

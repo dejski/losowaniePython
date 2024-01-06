@@ -73,9 +73,10 @@ def swap_players(team_with_top_player, team_to_swap_with, top_player, player_to_
 # Strona główna
 @app.route('/')
 def index():
+    show_draw_button = request.args.get('show') == 'true'
     players = load_data()
     players.sort(key=lambda x: x['name'])
-    return render_template('index.html', players=players)
+    return render_template('index.html', players=players, show_draw_button=show_draw_button)
 
 # Endpoint do aktualizacji stanu zawodnika
 @app.route('/update_status', methods=['POST'])
