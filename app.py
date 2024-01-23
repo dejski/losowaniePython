@@ -112,5 +112,26 @@ def clear_selection():
     save_data(players)
     return jsonify(success=True)
 
+
+@app.route('/edycja')  # Zmieniono ścieżkę na '/edycja'
+def edycja():
+    return render_template('edycja.html')  # Wczytuje edycja.html z folderu templates
+
+@app.route('/get_data', methods=['GET'])
+def get_data():
+    with open('players.json', 'r') as file:
+        data = json.load(file)
+    return jsonify(data)  # Zwraca dane JSON do interfejsu użytkownika
+
+@app.route('/update_data', methods=['POST'])
+def update_data():
+    new_data = request.json
+    with open('players.json', 'w') as file:
+        json.dump(new_data, file, indent=4)
+    return jsonify({"status": "success"})  # Potwierdza zapisanie danych
+
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)
