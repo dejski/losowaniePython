@@ -22,6 +22,7 @@
         <th class="narrow-column">Zawodnik</th>
         <th class="narrow-column">Obecny</th>
         <th class="narrow-column">Nieobecny</th>
+        <th width="80">Punkty</th>
         <th>Info</th>
     </tr>
     {% for player in players %}
@@ -35,6 +36,7 @@
                                                                        data-name="{{ player.name }}" {% if
                                                                        player.on_break %} checked
                                                                        {% endif %}></td>
+        <td>{{ player.points }}</td>
         <td><input type="text" class="info-input" data-name="{{ player.name }}" value="{{ player.info }}"></td>
     </tr>
     {% endfor %}
