@@ -23,7 +23,7 @@ def save_data(data):
 def modify_total_attributes(player):
     attribute_keys = ['kondycja', 'technika', 'gra_zespolowa', 'uderzenie']
     total_attributes = sum(player.get(key, 0) for key in attribute_keys)
-    change_percent = random.uniform(-0.08, 0.08)
+    change_percent = random.uniform(-0.05, 0.05)
     return total_attributes * (1 + change_percent)
 
 # Losowanie drużyn
