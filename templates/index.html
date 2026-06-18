@@ -1,226 +1,254 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <title>Losowanie</title>
-    <link rel="stylesheet" type="text/css" href="static/styles.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <link rel="shortcut icon" type="image/png" href="static/icon.png">
+  <meta charset="UTF-8">
+  <title>Losowanie drużyn</title>
+  <link rel="stylesheet" type="text/css" href="static/styles.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <link rel="shortcut icon" type="image/png" href="static/icon.png">
+
+  <style>
+    .info-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+    }
+
+    .info-input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 6px 8px;
+      border: 1px solid #bbb;
+      border-radius: 6px;
+      font-size: 16px;
+      background: #fff;
+    }
+
+    .info-input:focus {
+      outline: none;
+      border-color: #1899D6;
+      box-shadow: 0 0 0 3px rgba(24, 153, 214, 0.15);
+    }
+
+    .button-19 {
+      font-size: 18px;
+      padding: 14px 18px;
+      width: 220px;
+    }
+  </style>
 </head>
 <body>
-<div class="info-container">
+  <div class="info-container">
     <div class="players-count">
-        Liczba zawodników: <span id="presentCount">0</span>
+      Liczba zawodników: <span id="presentCount">0</span>
     </div>
-    <div class="next-match">
-        Najbliższy meczyk: <span id="nextMatchDate"></span>
-    </div>
-</div>
+  </div>
 
-<table id="playersTable">
-    <tr>
+  <table id="playersTable">
+    <colgroup>
+      <col class="col-name">
+      <col class="col-pres">
+      <col class="col-break">
+      <col class="col-info">
+    </colgroup>
+
+    <thead>
+      <tr>
         <th class="narrow-column">Zawodnik</th>
         <th class="narrow-column">Obecny</th>
-        <th class="narrow-column">Nieobecny</th>
-        <th width="80">Punkty</th>
+        <th class="narrow-column">Pauzuje</th>
         <th>Info</th>
-    </tr>
-    {% for player in players %}
-    <tr class="player-row" id="row-{{ player.name }}">
-        <td>{{ player.name }}</td>
-        <td style="text-align: center; vertical-align: middle;"><input type="checkbox" class="present-checkbox"
-                                                                       data-name="{{ player.name }}" {% if
-                                                                       player.is_present %}
-                                                                       checked {% endif %}></td>
-        <td style="text-align: center; vertical-align: middle;"><input type="checkbox" class="break-checkbox"
-                                                                       data-name="{{ player.name }}" {% if
-                                                                       player.on_break %} checked
-                                                                       {% endif %}></td>
-        <td>{{ player.points }}</td>
-        <td><input type="text" class="info-input" data-name="{{ player.name }}" value="{{ player.info }}"></td>
-    </tr>
-    {% endfor %}
-</table>
+      </tr>
+    </thead>
 
+    <tbody>
+      {% for player in players if player.pokazuj|default(true) %}
+      <tr class="player-row" id="row-{{ player.id }}">
+        <td class="name-cell" title="{{ player.name }}">{{ player.name }}</td>
 
-<br>
-{% if show_draw_button %}
-<button class="button-19" id="drawTeams">LOSUJ</button>
-<button class="button-19" id="clearSelection">WYCZYŚĆ</button>
-{% endif %}
-<script>
-    $(document).ready(function() {
-        updatePlayerRowStyles();
-        updatePresentCount()
-        $('#nextMatchDate').text(getNextMatchDate());
-        $('.present-checkbox').change(function() {
-            updatePlayerRowStyles();
-            var playerName = $(this).data('name');
-            var isPresent = $(this).is(':checked');
-            var row = $('#row-' + playerName);
-            var breakCheckbox = row.find('.break-checkbox');
+        <td class="center-cell">
+          <input
+            type="checkbox"
+            class="present-checkbox"
+            data-id="{{ player.id }}"
+            {% if player.is_present %}checked{% endif %}>
+        </td>
 
-            updatePlayerStatus(playerName, isPresent, breakCheckbox.is(':checked'));
-            breakCheckbox.prop('disabled', isPresent);
-            if (isPresent) {
-                row.addClass('player-present').removeClass('player-on-break');
-                breakCheckbox.prop('checked', false);
-            } else {
-                row.removeClass('player-present');
-            }
-            updatePresentCount();  // Aktualizacja licznika
-        });
+        <td class="center-cell">
+          <input
+            type="checkbox"
+            class="break-checkbox"
+            data-id="{{ player.id }}"
+            {% if player.on_break %}checked{% endif %}>
+        </td>
 
-        $('.break-checkbox').change(function() {
-            var playerName = $(this).data('name');
-            var onBreak = $(this).is(':checked');
-            var row = $('#row-' + playerName);
-            var presentCheckbox = row.find('.present-checkbox');
+        <td>
+          <input
+            type="text"
+            class="info-input"
+            data-id="{{ player.id }}"
+            value="{{ player.info }}">
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 
-            updatePlayerStatus(playerName, false, onBreak);
-            presentCheckbox.prop('checked', false).prop('disabled', onBreak);
-            if (onBreak) {
-                row.addClass('player-on-break').removeClass('player-present');
-            } else {
-                row.removeClass('player-on-break');
-            }
-            updatePresentCount();  // Aktualizacja licznika
-        });
+  <br>
+  {% if show_draw_button %}
+    <button class="button-19" id="drawTeams">LOSUJ</button>
+    <button class="button-19" id="clearSelection">WYCZYŚĆ</button>
+  {% endif %}
 
-        $('#drawTeams').click(function() {
-$.get('/losuj', function(data) {
-    window.location.href = '/losuj'; // Przekierowanie do strony z wynikami losowania
-});
-});
+  <script>
+    $(document).ready(function () {
+      updatePlayerRowStyles();
+      updatePresentCount();
 
+      // Zmiana "Obecny"
+      $('.present-checkbox').change(function () {
+        const playerId = $(this).data('id');
+        const isPresent = $(this).is(':checked');
+        const row = $('#row-' + playerId);
+        const breakCheckbox = row.find('.break-checkbox');
 
-$('.info-input').change(function() {
-var playerName = $(this).data('name');
-var infoValue = $(this).val();
-console.log("Wysyłanie danych:", playerName, infoValue);  // Dodaj tę linię
-var presentCheckbox = $('#row-' + playerName + ' .present-checkbox').is(':checked');
-var breakCheckbox = $('#row-' + playerName + ' .break-checkbox').is(':checked');
-
-$.ajax({
-    url: '/update_status',
-    method: 'POST',
-    contentType: 'application/json',
-    data: JSON.stringify({
-        name: playerName,
-        is_present: presentCheckbox,
-        on_break: breakCheckbox,
-        info: infoValue
-    }),
-    success: function(response) {
-        console.log('Informacje zaktualizowane');
-    }
-});
-});
-
-
-        $('#clearSelection').click(function() {
-$('.present-checkbox, .break-checkbox').prop('checked', false);
-$('.present-checkbox, .break-checkbox').prop('disabled', false);
-updatePlayerRowStyles();
-
-// Wysyłanie żądania do serwera Flask, aby zaktualizować plik JSON
-$.ajax({
-    url: '/clear_selection',
-    method: 'POST',
-    success: function(response) {
-        console.log('Checkboxy zostały wyczyszczone');
-    },
-    error: function() {
-        console.log('Wystąpił błąd przy czyszczeniu checkboxów');
-    }
-});
-});
-
-
-        function updatePlayerRowStyles() {
-        $('.player-row').each(function() {
-            var presentCheckbox = $(this).find('.present-checkbox');
-            var breakCheckbox = $(this).find('.break-checkbox');
-
-            if (presentCheckbox.is(':checked')) {
-                $(this).addClass('player-present').removeClass('player-on-break');
-            } else if (breakCheckbox.is(':checked')) {
-                $(this).addClass('player-on-break').removeClass('player-present');
-            } else {
-                $(this).removeClass('player-present player-on-break');
-            }
-        });
-    }
-
-
-        function updatePresentCount() {
-var count = $('.present-checkbox:checked').length;
-$('#presentCount').text(count);
-updatePlayerCountStyle(count)
-}
-
-        function updatePlayerStatus(name, isPresent, onBreak) {
-            $.ajax({
-                url: '/update_status',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    name: name,
-                    is_present: isPresent,
-                    on_break: onBreak
-                }),
-                success: function(response) {
-                    // Możesz dodać tutaj logikę obsługi odpowiedzi
-                }
-            });
+        breakCheckbox.prop('disabled', isPresent);
+        if (isPresent) {
+          row.addClass('player-present').removeClass('player-on-break');
+          breakCheckbox.prop('checked', false);
+        } else {
+          row.removeClass('player-present');
         }
+
+        updatePlayerStatus(playerId, isPresent, breakCheckbox.is(':checked'));
+        updatePresentCount();
+      });
+
+      // Zmiana "Pauzuje"
+      $('.break-checkbox').change(function () {
+        const playerId = $(this).data('id');
+        const onBreak = $(this).is(':checked');
+        const row = $('#row-' + playerId);
+        const presentCheckbox = row.find('.present-checkbox');
+
+        presentCheckbox.prop('checked', false).prop('disabled', onBreak);
+        if (onBreak) {
+          row.addClass('player-on-break').removeClass('player-present');
+        } else {
+          row.removeClass('player-on-break');
+        }
+
+        updatePlayerStatus(playerId, false, onBreak);
+        updatePresentCount();
+      });
+
+      // Losowanie
+      $('#drawTeams').click(function () {
+        window.location.href = '/losuj';
+      });
+
+      // Zmiana pola "Info" - zapis po utracie fokusu
+      $('.info-input').on('change blur', function () {
+        saveInfo($(this));
+      });
+
+      // Zmiana pola "Info" - Enter też zapisuje
+      $('.info-input').on('keydown', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          $(this).blur();
+        }
+      });
+
+      // Wyczyść zaznaczenia
+      $('#clearSelection').click(function () {
+        $('.present-checkbox, .break-checkbox').prop('checked', false).prop('disabled', false);
+        updatePlayerRowStyles();
+        updatePresentCount();
+
+        $.ajax({ url: '/clear_selection', method: 'POST' });
+      });
     });
 
+    function saveInfo($input) {
+      const playerId = $input.data('id');
+      const row = $('#row-' + playerId);
+      const infoValue = $input.val();
+      const isPresent = row.find('.present-checkbox').is(':checked');
+      const onBreak = row.find('.break-checkbox').is(':checked');
 
-    function getNextMatchDate() {
-    var today = new Date();
-    var nextMatch = new Date();
-    nextMatch.setHours(20, 0, 0, 0); // Ustawienie godziny na 20:00
-
-    // Ustalanie najbliższego dnia meczu (wtorek=2, czwartek=4)
-    if (today.getDay() <= 2) {
-        nextMatch.setDate(today.getDate() + (2 - today.getDay()));
-    } else if (today.getDay() <= 4) {
-        nextMatch.setDate(today.getDate() + (4 - today.getDay()));
-    } else {
-        nextMatch.setDate(today.getDate() + (9 - today.getDay())); // Następny wtorek
+      $.ajax({
+        url: '/update_status',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+          id: playerId,
+          is_present: isPresent,
+          on_break: onBreak,
+          info: infoValue
+        })
+      });
     }
 
-    // Formatowanie daty
-    var options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
-    return nextMatch.toLocaleString('pl-PL', options).replace(/\.|\/|\s/g, function(match) {
-        return match === ' ' ? ' ' : '.';
-    });
-}
+    // Klasy i blokady zgodnie ze stanem
+    function updatePlayerRowStyles() {
+      $('.player-row').each(function () {
+        const presentCheckbox = $(this).find('.present-checkbox');
+        const breakCheckbox = $(this).find('.break-checkbox');
 
+        if (presentCheckbox.is(':checked')) {
+          $(this).addClass('player-present').removeClass('player-on-break');
+          breakCheckbox.prop('disabled', true);
+        } else if (breakCheckbox.is(':checked')) {
+          $(this).addClass('player-on-break').removeClass('player-present');
+          presentCheckbox.prop('disabled', true);
+        } else {
+          $(this).removeClass('player-present player-on-break');
+          presentCheckbox.prop('disabled', false);
+          breakCheckbox.prop('disabled', false);
+        }
+      });
+    }
+
+    // Licznik obecnych
+    function updatePresentCount() {
+      const count = $('.present-checkbox:checked').length;
+      $('#presentCount').text(count);
+      updatePlayerCountStyle(count);
+    }
+
+    // Aktualizacja statusu gracza (po ID)
+    function updatePlayerStatus(id, isPresent, onBreak) {
+      $.ajax({
+        url: '/update_status',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ id: id, is_present: isPresent, on_break: onBreak })
+      });
+    }
+
+    // Kolorowanie licznika obecnych
     function updatePlayerCountStyle(playerCount) {
-    var countElement = document.getElementById('presentCount');
-    countElement.textContent = playerCount;
+      const countElement = document.getElementById('presentCount');
+      countElement.textContent = playerCount;
+      countElement.style.backgroundColor = '';
 
-    // Resetowanie stylów
-    countElement.style.backgroundColor = '';
-
-    // Stosowanie odpowiednich stylów w zależności od liczby zawodników
-    if (playerCount < 10) {
-        countElement.style.backgroundColor = 'pink'; // Różowy
-    } else if (playerCount == 11) {
-        countElement.style.backgroundColor = 'yellow'; // Żółty
-    } else if (playerCount == 12 || playerCount == 10) {
-        countElement.style.backgroundColor = 'lightgreen'; // Zielony
-    } else if (playerCount == 13) {
-        countElement.style.backgroundColor = 'yellow'; // Żółty
-    } else if (playerCount == 14) {
-        countElement.style.backgroundColor = 'lightblue'; // Zielony
-    } else if (playerCount > 14) {
-        countElement.style.backgroundColor = 'red'; // Czerwony
+      if (playerCount < 10) {
+        countElement.style.backgroundColor = 'pink';
+      } else if (playerCount === 11) {
+        countElement.style.backgroundColor = 'yellow';
+      } else if (playerCount === 12 || playerCount === 10) {
+        countElement.style.backgroundColor = 'lightgreen';
+      } else if (playerCount === 13) {
+        countElement.style.backgroundColor = 'yellow';
+      } else if (playerCount === 14) {
+        countElement.style.backgroundColor = 'lightblue';
+      } else if (playerCount > 14) {
+        countElement.style.backgroundColor = 'red';
+      }
     }
-}
-
-</script>
+  </script>
 </body>
 </html>

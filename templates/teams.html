@@ -1,58 +1,316 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
     <title>Drużyny</title>
     <link rel="stylesheet" type="text/css" href="static/styles.css">
     <link rel="shortcut icon" type="image/png" href="static/icon.png">
-        <style>
-        .container {
+    <style>
+        .teams-page {
+            background: #f5f5f5;
+            color: #111;
+            margin: 0;
+        }
+
+        .teams-layout {
+            max-width: 1200px;
+            margin: 20px auto 0;
+            padding: 0 20px 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .team-card {
+            border: 1px solid #222;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,.04);
+        }
+
+        .team-a {
+            background-color: {% if current_day in ['Tuesday', 'Wednesday'] %}#ffffff{% else %}#fffdfd{% endif %};
+        }
+
+        .team-b {
+            background-color: {% if current_day == 'Thursday' %}#f5c7d2{% else %}#f3d1da{% endif %};
+        }
+
+        .team-card__header {
+            padding: 28px 28px 10px;
+        }
+
+        .team-card__title {
+            margin: 0;
+            font-size: 34px;
+            line-height: 1.15;
+            font-weight: 800;
+        }
+
+        .team-list {
+            list-style: disc;
+            margin: 10px 0 0;
+            padding: 0 28px 8px 48px;
+        }
+
+        .team-player {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0,0,0,.22);
+            font-size: 21px;
+        }
+
+        .team-player:last-child {
+            border-bottom: none;
+        }
+
+        .team-summary {
+            margin: 6px 28px 22px;
+            padding: 18px 18px 14px;
+            border-radius: 10px;
+            background: rgba(255,255,255,.55);
+            border: 1px solid rgba(0,0,0,.08);
+        }
+
+        .team-summary__title {
+            margin: 0 0 14px;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .summary-row {
+            display: grid;
+            grid-template-columns: 150px 1fr 64px;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .summary-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .summary-label {
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .summary-bar {
+            height: 16px;
+            border-radius: 999px;
+            background: rgba(0,0,0,.12);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .summary-bar__fill {
+            height: 100%;
+            width: var(--width, 0%);
+            border-radius: inherit;
+        }
+
+        .bar-kondycja { background: #43a047; }
+        .bar-technika { background: #1e88e5; }
+        .bar-gra { background: #8e44ad; }
+        .bar-uderzenie { background: #ef6c00; }
+
+        .summary-value {
+            text-align: right;
+            font-size: 18px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .team-card__footer {
+            border-top: 1px solid rgba(0,0,0,.18);
+            padding: 16px 28px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            background: rgba(255,255,255,.28);
+        }
+
+        .team-card__subinfo {
+            font-size: 14px;
+            font-weight: 400;
+            color: #666;
+            margin-top: 6px;
+        }
+
+        .teams-actions {
+            max-width: 900px;
+            margin: 10px auto 0;
+            padding: 0 20px 30px;
             display: flex;
             justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
         }
-        .column {
-            margin: 10px;
-            padding: 20px;
-            border: 1px solid black;
-            border-radius: 5px;
+
+        @media (max-width: 900px) {
+            .teams-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-row {
+                grid-template-columns: 120px 1fr 64px;
+            }
         }
-        .team-a { background-color: {% if current_day == 'Tuesday' %}pink{% else %}white{% endif %}; }
-        .team-b { background-color: {% if current_day == 'Thursday' %}pink{% else %}white{% endif %}; }
-        body, button, input {
-            font-size: 20px;
+
+        @media (max-width: 560px) {
+            .team-card__title {
+                font-size: 28px;
+            }
+
+            .team-player {
+                font-size: 18px;
+            }
+
+            .summary-row {
+                grid-template-columns: 1fr;
+                gap: 6px;
+            }
+
+            .summary-value {
+                text-align: left;
+            }
         }
     </style>
 </head>
-<body>
-<div class="container">
-    <div class="column team-a">
-        <h1>Drużyna A ({{ sum_a }})</h1>
-        <ul>
+<body class="teams-page">
+
+{% set max_attr_sum = 10 * ([team_a|length, team_b|length]|max) %}
+
+{% set a_kondycja = team_a | sum(attribute='kondycja') %}
+{% set a_technika = team_a | sum(attribute='technika') %}
+{% set a_gra = team_a | sum(attribute='gra_zespolowa') %}
+{% set a_uderzenie = team_a | sum(attribute='uderzenie') %}
+
+{% set b_kondycja = team_b | sum(attribute='kondycja') %}
+{% set b_technika = team_b | sum(attribute='technika') %}
+{% set b_gra = team_b | sum(attribute='gra_zespolowa') %}
+{% set b_uderzenie = team_b | sum(attribute='uderzenie') %}
+
+<div class="teams-layout">
+    <section class="team-card team-a">
+        <div class="team-card__header">
+            <h1 class="team-card__title">Drużyna A</h1>
+        </div>
+
+        <ul class="team-list">
             {% for player in team_a %}
-            <li>{{ player['name'] }}</li><hr>
+            <li class="team-player">{{ player['name'] }}</li>
             {% endfor %}
         </ul>
-    </div>
-    <div class="column team-b">
-        <h1>Drużyna B ({{ sum_b }})</h1>
-        <ul>
+
+        <div class="team-summary">
+            <h2 class="team-summary__title">Suma cech drużyny</h2>
+
+            <div class="summary-row">
+                <span class="summary-label">Kondycja</span>
+                <div class="summary-bar" style="--width: {{ (a_kondycja / max_attr_sum * 100) if max_attr_sum else 0 }}%;">
+                    <div class="summary-bar__fill bar-kondycja"></div>
+                </div>
+                <span class="summary-value">{{ "%.1f"|format(a_kondycja) }}</span>
+            </div>
+
+            <div class="summary-row">
+                <span class="summary-label">Technika</span>
+                <div class="summary-bar" style="--width: {{ (a_technika / max_attr_sum * 100) if max_attr_sum else 0 }}%;">
+                    <div class="summary-bar__fill bar-technika"></div>
+                </div>
+                <span class="summary-value">{{ "%.1f"|format(a_technika) }}</span>
+            </div>
+
+            <div class="summary-row">
+                <span class="summary-label">Gra zespołowa</span>
+                <div class="summary-bar" style="--width: {{ (a_gra / max_attr_sum * 100) if max_attr_sum else 0 }}%;">
+                    <div class="summary-bar__fill bar-gra"></div>
+                </div>
+                <span class="summary-value">{{ "%.1f"|format(a_gra) }}</span>
+            </div>
+
+            <div class="summary-row">
+                <span class="summary-label">Uderzenie</span>
+                <div class="summary-bar" style="--width: {{ (a_uderzenie / max_attr_sum * 100) if max_attr_sum else 0 }}%;">
+                    <div class="summary-bar__fill bar-uderzenie"></div>
+                </div>
+                <span class="summary-value">{{ "%.1f"|format(a_uderzenie) }}</span>
+            </div>
+        </div>
+
+        <div class="team-card__footer">
+            Suma bazowa: {{ "%.1f"|format(sum_a) }}
+            <div class="team-card__subinfo">
+                balans losowania uwzględniał wariant ±3%
+            </div>
+        </div>
+    </section>
+
+    <section class="team-card team-b">
+        <div class="team-card__header">
+            <h1 class="team-card__title">Drużyna B</h1>
+        </div>
+
+        <ul class="team-list">
             {% for player in team_b %}
-            <li>{{ player['name'] }}</li><hr>
+            <li class="team-player">{{ player['name'] }}</li>
             {% endfor %}
         </ul>
-    </div>
+
+        <div class="team-summary">
+            <h2 class="team-summary__title">Suma cech drużyny</h2>
+
+            <div class="summary-row">
+                <span class="summary-label">Kondycja</span>
+                <div class="summary-bar" style="--width: {{ (b_kondycja / max_attr_sum * 100) if max_attr_sum else 0 }}%;">
+                    <div class="summary-bar__fill bar-kondycja"></div>
+                </div>
+                <span class="summary-value">{{ "%.1f"|format(b_kondycja) }}</span>
+            </div>
+
+            <div class="summary-row">
+                <span class="summary-label">Technika</span>
+                <div class="summary-bar" style="--width: {{ (b_technika / max_attr_sum * 100) if max_attr_sum else 0 }}%;">
+                    <div class="summary-bar__fill bar-technika"></div>
+                </div>
+                <span class="summary-value">{{ "%.1f"|format(b_technika) }}</span>
+            </div>
+
+            <div class="summary-row">
+                <span class="summary-label">Gra zespołowa</span>
+                <div class="summary-bar" style="--width: {{ (b_gra / max_attr_sum * 100) if max_attr_sum else 0 }}%;">
+                    <div class="summary-bar__fill bar-gra"></div>
+                </div>
+                <span class="summary-value">{{ "%.1f"|format(b_gra) }}</span>
+            </div>
+
+            <div class="summary-row">
+                <span class="summary-label">Uderzenie</span>
+                <div class="summary-bar" style="--width: {{ (b_uderzenie / max_attr_sum * 100) if max_attr_sum else 0 }}%;">
+                    <div class="summary-bar__fill bar-uderzenie"></div>
+                </div>
+                <span class="summary-value">{{ "%.1f"|format(b_uderzenie) }}</span>
+            </div>
+        </div>
+
+        <div class="team-card__footer">
+            Suma bazowa: {{ "%.1f"|format(sum_b) }}
+            <div class="team-card__subinfo">
+                balans losowania uwzględniał wariant ±3%
+            </div>
+        </div>
+    </section>
 </div>
 
-<div class="przyciski">
-    <br><br><br><br><br><br>
+<div class="teams-actions">
     <button class="button-19" id="redrawTeams">Losuj ponownie</button>
-    <br><br>
-    <button class="button-19" onclick="location.href='/?show=true'">Powrót do Strony Głównej</button>
-
+    <button class="button-19" onclick="location.href='/?show=true'">Powrót do strony głównej</button>
 </div>
+
 <script>
     document.getElementById('redrawTeams').addEventListener('click', function() {
-<!--    console.log("Przycisk Losuj został kliknięty.");-->
         window.location.href = '/losuj';
     });
 </script>

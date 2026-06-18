@@ -1,27 +1,79 @@
-.container {
-            display: flex;
-            justify-content: center;
-        }
-        .przyciski {
-            justify-content: center;
-            position: absolute;
-            left: 45%;
-        }
-        .column {
-            margin: 10px;
-            padding: 20px;
-            border: 1px solid black;
-            border-radius: 5px;
-        }
-        .team-a { background-color: {% if current_day == 'Tuesday' %}pink{% else %}white{% endif %}; }
-        .team-b { background-color: {% if current_day == 'Thursday' %}pink{% else %}white{% endif %}; }
-        body, button, input {
-            font-size: 20px;
-        }
+/* Ogólne */
+body, button, input {
+  font-size: 22px;
+  font-family: Arial, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
 
+/* Układ nagłówka */
+.info-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  font-size: 25px;
+}
 
+/* Tabela: jednowierszowe komórki, elipsy, stały layout */
+#playersTable {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* ważne dla elips i niełamania */
+}
 
-        .button-19 {
+#playersTable th,
+#playersTable td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  padding: 8px;
+}
+
+/* Granice tabeli */
+th, td {
+  border: 1px solid black;
+}
+
+th {
+  background-color: #D3D3D3;
+}
+
+/* Szerokości kolumn (colgroup) */
+#playersTable .col-name  { width: 20%; }
+#playersTable .col-pres  { width: 110px; }
+#playersTable .col-break { width: 110px; }
+#playersTable .col-info  { width: auto; }
+
+/* Wyrównania */
+.center-cell {
+  text-align: center;
+}
+
+/* Domyślny wygląd wiersza */
+.player-row td {
+  background-color: #ffffff;
+  transition: background-color .15s ease;
+}
+
+/* Kolorowanie stanów — nakładamy kolor na komórki, nie na <tr> */
+tr.player-present td { background-color: lightgreen; }
+tr.player-on-break td { background-color: lightblue; }
+
+/* Checkboxy większe dla wygody */
+input[type="checkbox"] {
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+}
+
+/* Pole "Info" nie psuje wysokości wiersza */
+.info-input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Przycisk */
+.button-19 {
   appearance: button;
   background-color: #1899D6;
   border: solid transparent;
@@ -31,7 +83,7 @@
   color: #FFFFFF;
   cursor: pointer;
   display: inline-block;
-  font-family: din-round,sans-serif;
+  font-family: din-round, sans-serif;
   font-size: 15px;
   font-weight: 700;
   letter-spacing: .8px;
@@ -49,8 +101,8 @@
   -webkit-user-select: none;
   vertical-align: middle;
   white-space: nowrap;
-  width: 200;
-
+  width: 200px; /* brak jednostki w oryginale — dodałem px */
+  position: relative; /* potrzebne dla :after */
 }
 
 .button-19:after {
@@ -68,73 +120,41 @@
   z-index: -1;
 }
 
-.button-19:main,
-.button-19:focus {
-  user-select: auto;
-}
-
 .button-19:hover:not(:disabled) {
   filter: brightness(1.1);
   -webkit-filter: brightness(1.1);
 }
 
-.button-19:disabled {
-  cursor: auto;
-}
+.button-19:disabled { cursor: auto; }
 
 .button-19:active {
   border-width: 4px 0 0;
   background: none;
 }
-body, button, input {
-            font-size: 22px;
-            font-family: Arial;
-        }
-        .player-row {
-            background-color: white;
-        }
-        .player-present {
-            background-color: lightgreen;
-        }
-        .player-on-break {
-            background-color: lightblue;
-        }
 
-        input[type="checkbox"] {
-            width: 25px;  /* szerokość checkboxa */
-            height: 25px; /* wysokość checkboxa */
-            cursor: pointer; /* opcjonalnie, zmienia kursor na wskaźnik */
-        }
-        table {
-            border-collapse: collapse; /* Usuwa podwójne ramki */
-            width: 60%; /* Opcjonalnie, rozciąga tabelę na całą dostępną szerokość */
-        }
-        th, td {
-            border: 1px solid black; /* Czarna ramka dla komórek tabeli */
-            text-align: left; /* Wyrównanie tekstu do lewej */
-            padding: 2px; /* Dodaje padding do komórek */
-        }
-        th {
-            background-color: #D3D3D3; /* Szare tło dla nagłówków */
-        }
-        p {
-            font-weight: bold;
-            font-weight: 800;
-        }
-        .info-input {
-    width: 100%;
-    box-sizing: border-box; /* Opcjonalnie, zapewnia, że padding i border nie rozszerzą inputa poza 100% szerokości */
+/* Pozostałe klasy z wcześniejszego CSS – tu bez Jinja! (Jinja nie działa w plikach statycznych) */
+.container {
+  display: flex;
+  justify-content: center;
 }
 
-.narrow-column {
-    width: 150px; /* Możesz dostosować szerokość według potrzeb */
+.przyciski {
+  justify-content: center;
+  position: absolute;
+  left: 45%;
 }
-.info-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    /* Możesz dodać dodatkowe style, takie jak marginesy, kolory tła itp. */
-    font-size: 25px;
-            font-family: Arial;
+
+/* Jeśli używasz .column / .team-a / .team-b w innych widokach,
+   trzymaj ich kolory warunkowe (Jinja) w plikach HTML, nie tutaj. */
+.column {
+  margin: 10px;
+  padding: 20px;
+  border: 1px solid black;
+  border-radius: 5px;
 }
+
+/* Opcjonalnie: nagłówki wąskie (używane w <th>) */
+.narrow-column { width: 150px; }
+
+/* Nazwa komórki — tooltip działa, styl pomocniczy */
+.name-cell { /* rezerwowane na przyszłość */ }

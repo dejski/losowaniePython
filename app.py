@@ -1,137 +1,253 @@
+import json
+import random
+import locale
 from datetime import datetime
 
 from flask import Flask, render_template, jsonify, request
-import json
-import random
 
 app = Flask(__name__)
 
+RANDOMNESS = 0.03  # 3%
+DRAW_ATTEMPTS = 300
+EXTRA_PLAYER_WEIGHT = 0.60
+
+
+
 # Załaduj dane z pliku JSON
 def load_data():
-    with open("players.json", "r") as file:
+    with open("players.json", "r", encoding="utf-8") as file:
         players = json.load(file)
         for player in players:
-            player.setdefault('info', '')  # Ustawia domyślną wartość, jeśli klucz 'info' nie istnieje
+            player.setdefault("info", "")
+            player.setdefault("pokazuj", True)
+            player.setdefault("is_present", False)
+            player.setdefault("on_break", False)
         return players
+
 
 # Zapisz dane do pliku JSON
 def save_data(data):
-    with open("players.json", "w") as file:
-        json.dump(data, file, indent=4)
+    with open("players.json", "w", encoding="utf-8") as file:
+        json.dump(data, file, indent=4, ensure_ascii=False)
 
-# Modyfikacja sumy cech zawodnika
-def modify_total_attributes(player):
-    attribute_keys = ['kondycja', 'technika', 'gra_zespolowa', 'uderzenie']
-    total_attributes = sum(player.get(key, 0) for key in attribute_keys)
-    change_percent = random.uniform(-0.05, 0.05)
-    return total_attributes * (1 + change_percent)
 
-# Losowanie drużyn
-def losuj(players):
+RANDOMNESS = 0.03
+DRAW_ATTEMPTS = 1000
+EXTRA_PLAYER_WEIGHT = 0.60
+
+
+def base_total(player):
+    attribute_keys = ["kondycja", "technika", "gra_zespolowa", "uderzenie"]
+    return sum(player.get(key, 0) for key in attribute_keys)
+
+
+def modified_total(player):
+    total = base_total(player)
+    change_percent = random.uniform(-RANDOMNESS, RANDOMNESS)
+    return total * (1 + change_percent)
+
+
+def team_base_total(team):
+    return sum(base_total(p) for p in team)
+
+
+def effective_team_total(team, opponent_team):
+    total = sum(p.get("draw_total", 0) for p in team)
+
+    if len(team) > len(opponent_team):
+        weakest = min(team, key=lambda p: p.get("draw_total", 0))
+        total -= weakest.get("draw_total", 0) * (1 - EXTRA_PLAYER_WEIGHT)
+
+    return total
+
+
+def effective_team_attribute_sum(team, opponent_team, attr):
+    total = sum(p.get(attr, 0) for p in team)
+
+    if len(team) > len(opponent_team):
+        weakest = min(team, key=lambda p: p.get("draw_total", 0))
+        total -= weakest.get(attr, 0) * (1 - EXTRA_PLAYER_WEIGHT)
+
+    return total
+
+
+def evaluate_draw(team_a, team_b):
+    attrs = ["kondycja", "technika", "gra_zespolowa", "uderzenie"]
+
+    total_a = effective_team_total(team_a, team_b)
+    total_b = effective_team_total(team_b, team_a)
+
+    total_diff = abs(total_a - total_b)
+
+    attr_diff = 0
+    for attr in attrs:
+        a_attr = effective_team_attribute_sum(team_a, team_b, attr)
+        b_attr = effective_team_attribute_sum(team_b, team_a, attr)
+        attr_diff += abs(a_attr - b_attr)
+
+    score = (total_diff * 3.0) + (attr_diff * 1.5)
+
+    return score
+
+
+def build_candidate(players):
+    working = []
+
     for player in players:
-        player['modified_total'] = modify_total_attributes(player)
+        p = dict(player)
+        p["draw_total"] = modified_total(p)
+        working.append(p)
 
-    sorted_players = sorted(players, key=lambda x: x['modified_total'], reverse=True)
-    team_a, team_b = [], []
-    sum_a, sum_b = 0, 0
+    random.shuffle(working)
 
-    # Rozdzielenie wszystkich graczy między drużyny
-    for player in sorted_players:
-        if sum_a <= sum_b:
-            team_a.append(player)
-            sum_a += player['modified_total']
-        else:
-            team_b.append(player)
-            sum_b += player['modified_total']
+    if len(players) % 2 == 0:
+        target_a = len(players) // 2
+    else:
+        # Przy nieparzystej liczbie raz większa może być A, raz B
+        target_a = random.choice([
+            len(players) // 2,
+            len(players) // 2 + 1
+        ])
 
-    # Jeśli liczba zawodników jest nieparzysta, dokonaj wymiany jeśli to konieczne
-    if len(players) % 2 != 0:
-        top_two_players = sorted_players[:2]
-        for top_player in top_two_players:
-            if (top_player in team_a and len(team_a) > len(team_b)) or (top_player in team_b and len(team_b) > len(team_a)):
-                # Wymiana gracza
-                team_with_top_player = team_a if top_player in team_a else team_b
-                team_to_swap_with = team_b if team_with_top_player == team_a else team_a
-                player_to_swap = min(team_to_swap_with, key=lambda x: x['modified_total'])
-                team_with_top_player, team_to_swap_with = swap_players(team_with_top_player, team_to_swap_with, top_player, player_to_swap)
+    team_a = working[:target_a]
+    team_b = working[target_a:]
 
-    return team_a, team_b, round(sum_a), round(sum_b)
-
-def swap_players(team_with_top_player, team_to_swap_with, top_player, player_to_swap):
-    team_with_top_player.remove(top_player)
-    team_to_swap_with.append(top_player)
-    team_to_swap_with.remove(player_to_swap)
-    team_with_top_player.append(player_to_swap)
-    return team_with_top_player, team_to_swap_with
+    return team_a, team_b
 
 
+def losuj(players):
+    if len(players) < 2:
+        return players, [], team_base_total(players), 0
 
+    best_team_a = None
+    best_team_b = None
+    best_score = float("inf")
 
+    for _ in range(DRAW_ATTEMPTS):
+        team_a, team_b = build_candidate(players)
+        score = evaluate_draw(team_a, team_b)
 
+        if score < best_score:
+            best_score = score
+            best_team_a = team_a
+            best_team_b = team_b
+
+    sum_a = team_base_total(best_team_a)
+    sum_b = team_base_total(best_team_b)
+
+    return best_team_a, best_team_b, sum_a, sum_b
 
 
 # Strona główna
-@app.route('/')
+@app.route("/")
 def index():
-    show_draw_button = request.args.get('show') == 'true'
+    show_draw_button = request.args.get("show") == "true"
     players = load_data()
-    players.sort(key=lambda x: x['name'])
-    return render_template('index.html', players=players, show_draw_button=show_draw_button)
+
+    # ukryj niepokazywanych
+    players = [p for p in players if p.get("pokazuj", True)]
+
+    # sortowanie PL
+    try:
+        locale.setlocale(locale.LC_COLLATE, "pl_PL.UTF-8")
+        key_fn = lambda p: locale.strxfrm(p.get("name", ""))
+    except locale.Error:
+        key_fn = lambda p: p.get("name", "")
+
+    players.sort(key=key_fn)
+    return render_template(
+        "index.html",
+        players=players,
+        show_draw_button=show_draw_button
+    )
+
 
 # Endpoint do aktualizacji stanu zawodnika
-@app.route('/update_status', methods=['POST'])
+@app.route("/update_status", methods=["POST"])
 def update_status():
     data = request.json
-    # print("Otrzymane dane:", data)  # Dodaj tę linię do logowania
+    pid = data.get("id")
+
+    if pid is None:
+        return jsonify(success=False, error="Missing id"), 400
+
     players = load_data()
-    for player in players:
-        if player["name"] == data["name"]:
-            player["is_present"] = data["is_present"]
-            player["on_break"] = data["on_break"]
-            if "info" in data:  # Sprawdź, czy pole 'info' istnieje w danych
-                player["info"] = data["info"]
+
+    for p in players:
+        if str(p.get("id")) == str(pid):
+            if "is_present" in data:
+                p["is_present"] = bool(data["is_present"])
+            if "on_break" in data:
+                p["on_break"] = bool(data["on_break"])
+            if "info" in data:
+                p["info"] = data["info"]
+            break
+
     save_data(players)
     return jsonify(success=True)
 
 
 # Endpoint do losowania drużyn
-@app.route('/losuj')
+@app.route("/losuj")
 def api_losuj():
-    players = [player for player in load_data() if player['is_present'] and not player['on_break']]
+    players = [
+        player for player in load_data()
+        if player.get("is_present", False) and not player.get("on_break", False)
+    ]
+
     team_a, team_b, sum_a, sum_b = losuj(players)
-    current_day = datetime.now().strftime('%A')
-    return render_template('teams.html', team_a=team_a, team_b=team_b, sum_a=sum_a, sum_b=sum_b, current_day=current_day)
+
+    # sortowanie PL
+    try:
+        locale.setlocale(locale.LC_COLLATE, "pl_PL.UTF-8")
+        key_fn = lambda p: locale.strxfrm(p.get("name", ""))
+    except locale.Error:
+        key_fn = lambda p: p.get("name", "")
+
+    team_a = sorted(team_a, key=key_fn)
+    team_b = sorted(team_b, key=key_fn)
+
+    current_day = datetime.now().strftime("%A")
+    return render_template(
+        "teams.html",
+        team_a=team_a,
+        team_b=team_b,
+        sum_a=sum_a,
+        sum_b=sum_b,
+        current_day=current_day
+    )
+
 
 # Endpoint do wyczyszczenia selekcji
-@app.route('/clear_selection', methods=['POST'])
+@app.route("/clear_selection", methods=["POST"])
 def clear_selection():
     players = load_data()
     for player in players:
-        player['is_present'] = False
-        player['on_break'] = False
+        player["is_present"] = False
+        player["on_break"] = False
     save_data(players)
     return jsonify(success=True)
 
 
-@app.route('/edycja')  # Zmieniono ścieżkę na '/edycja'
+@app.route("/edycja")
 def edycja():
-    return render_template('edycja.html')  # Wczytuje edycja.html z folderu templates
+    return render_template("edycja.html")
 
-@app.route('/get_data', methods=['GET'])
+
+@app.route("/get_data", methods=["GET"])
 def get_data():
-    with open('players.json', 'r') as file:
+    with open("players.json", "r", encoding="utf-8") as file:
         data = json.load(file)
-    return jsonify(data)  # Zwraca dane JSON do interfejsu użytkownika
+    return jsonify(data)
 
-@app.route('/update_data', methods=['POST'])
+
+@app.route("/update_data", methods=["POST"])
 def update_data():
     new_data = request.json
-    with open('players.json', 'w') as file:
-        json.dump(new_data, file, indent=4)
-    return jsonify({"status": "success"})  # Potwierdza zapisanie danych
+    with open("players.json", "w", encoding="utf-8") as file:
+        json.dump(new_data, file, indent=4, ensure_ascii=False)
+    return jsonify({"status": "success"})
 
 
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)

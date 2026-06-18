@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edycja danych JSON</title>
+</head>
+<body>
+    <h1>Edycja danych JSON</h1>
+    <textarea id="jsonData" rows="20" cols="50"></textarea><br>
+    <button onclick="updateData()">Zapisz zmiany</button>
+
+    <script>
+        // Funkcja wczytująca dane
+        function loadData() {
+            fetch('/get_data')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('jsonData').value = JSON.stringify(data, null, 4);
+                });
+        }
+
+        // Funkcja aktualizująca dane
+        function updateData() {
+            var data = JSON.parse(document.getElementById('jsonData').value);
+            fetch('/update_data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Dane zostały zaktualizowane!');
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Wczytaj dane przy załadowaniu strony
+        window.onload = loadData;
+    </script>
+</body>
+</html>

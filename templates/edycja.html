@@ -1,46 +1,256 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edycja danych JSON</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edycja zawodników</title>
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; margin: 20px; }
+    h1 { font-size: 1.4rem; margin-bottom: 12px; }
+    .toolbar { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+    .toolbar button { padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; }
+    .toolbar button:hover { background: #f5f5f5; }
+    .status { font-size: .95rem; opacity: .8; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    thead th { position: sticky; top: 0; background: #fafafa; z-index: 1; }
+    th, td { border: 1px solid #eee; padding: 8px; text-align: left; }
+    tbody tr:nth-child(even) { background: #fcfcfc; }
+    td input[type="number"] { width: 100%; box-sizing: border-box; padding: 6px; border: 1px solid #ddd; border-radius: 6px; }
+    .name { white-space: nowrap; }
+    .small { font-size: .85rem; color: #666; }
+    .add-card { border: 1px dashed #bbb; border-radius: 10px; padding: 12px; margin: 8px 0 4px; }
+    .add-grid { display: grid; grid-template-columns: 1fr repeat(4, minmax(80px, 120px)) auto; gap: 8px; align-items: center; }
+    .add-grid input[type="text"], .add-grid input[type="number"] { width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 6px; }
+    .muted { font-size: .85rem; color: #666; margin-top: 4px; }
+    .center { text-align: center; }
+  </style>
 </head>
 <body>
-    <h1>Edycja danych JSON</h1>
-    <textarea id="jsonData" rows="20" cols="50"></textarea><br>
-    <button onclick="updateData()">Zapisz zmiany</button>
+  <h1>Edycja parametrów zawodników</h1>
 
-    <script>
-        // Funkcja wczytująca dane
-        function loadData() {
-            fetch('/get_data')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('jsonData').value = JSON.stringify(data, null, 4);
-                });
+  <div class="toolbar">
+    <button id="saveBtn">💾 Zapisz zmiany</button>
+    <button id="reloadBtn">🔄 Odśwież</button>
+    <span class="status" id="status">—</span>
+  </div>
+
+  <!-- Formularz dodawania nowego zawodnika -->
+  <div class="add-card">
+    <div class="add-grid">
+      <input id="addName" type="text" placeholder="Imię / ksywka" aria-label="Imię" required />
+      <input id="addGZ" type="number" step="1" min="0" max="10" placeholder="Gra zespołowa" aria-label="Gra zespołowa" />
+      <input id="addK"  type="number" step="1" min="0" max="10" placeholder="Kondycja" aria-label="Kondycja" />
+      <input id="addT"  type="number" step="1" min="0" max="10" placeholder="Technika" aria-label="Technika" />
+      <input id="addU"  type="number" step="1" min="0" max="10" placeholder="Uderzenie" aria-label="Uderzenie" />
+      <button id="addBtn">➕ Dodaj zawodnika</button>
+    </div>
+    <div class="muted">Po dodaniu kliknij „Zapisz zmiany”, aby trwale zapisać do <code>players.json</code>.</div>
+  </div>
+
+  <table aria-label="Tabela edycji zawodników">
+    <thead>
+      <tr>
+        <th>Zawodnik</th>
+        <th class="center">Pokazuj?</th>
+        <th>Gra zespołowa<br><span class="small">(gra_zespolowa)</span></th>
+        <th>Kondycja<br><span class="small">(kondycja)</span></th>
+        <th>Technika<br><span class="small">(technika)</span></th>
+        <th>Uderzenie<br><span class="small">(uderzenie)</span></th>
+      </tr>
+    </thead>
+    <tbody id="playersBody"></tbody>
+  </table>
+
+  <script>
+    const ATTRS = ['gra_zespolowa', 'kondycja', 'technika', 'uderzenie'];
+    let players = [];
+
+    const $ = (sel) => document.querySelector(sel);
+    const statusEl = $('#status');
+
+    function setStatus(text) { statusEl.textContent = text; }
+
+    async function loadData() {
+      try {
+        setStatus('Wczytywanie danych…');
+        const res = await fetch('/get_data');
+        const data = await res.json();
+        players = Array.isArray(data) ? data.map(p => ({ ...p })) : [];
+        // Ustaw domyślnie pokazuj=true gdy brak klucza
+        players.forEach(p => { if (p.pokazuj === undefined) p.pokazuj = true; });
+        renderTable();
+        setStatus(`Wczytano ${players.length} zawodników.`);
+      } catch (e) {
+        console.error(e);
+        setStatus('Błąd wczytywania danych.');
+        alert('Nie udało się wczytać danych.');
+      }
+    }
+
+    function asNumberOrZero(value) {
+      const n = Number(value);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function makeNumberInput(playerIndex, key) {
+      const input = document.createElement('input');
+      input.type = 'number';
+      input.inputMode = 'numeric';
+      input.step = '1';
+      input.min = '0';
+      input.max = '10'; // jeśli skala inna, dostosuj
+      input.value = asNumberOrZero(players[playerIndex][key] ?? 0);
+      input.addEventListener('change', (e) => {
+        const v = asNumberOrZero(e.target.value);
+        players[playerIndex][key] = Math.max(0, v);
+      });
+      return input;
+    }
+
+    function makeShowCheckbox(playerIndex) {
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+      input.checked = players[playerIndex].pokazuj !== false; // domyślnie true
+      input.addEventListener('change', (e) => {
+        players[playerIndex].pokazuj = !!e.target.checked;
+      });
+      return input;
+    }
+
+    function renderTable() {
+      const tbody = $('#playersBody');
+      tbody.innerHTML = '';
+
+      // sortuj po nazwie, ale iteruj po indeksach, żeby stabilnie modyfikować players[]
+      const indices = players.map((_, i) => i).sort((a, b) =>
+        (players[a].name || '').localeCompare(players[b].name || '', 'pl')
+      );
+
+      indices.forEach((i) => {
+        const p = players[i];
+        const tr = document.createElement('tr');
+
+        // Nazwa
+        const nameTd = document.createElement('td');
+        nameTd.className = 'name';
+        nameTd.textContent = p.name || '(bez nazwy)';
+        tr.appendChild(nameTd);
+
+        // Pokazuj?
+        const showTd = document.createElement('td');
+        showTd.className = 'center';
+        showTd.appendChild(makeShowCheckbox(i));
+        tr.appendChild(showTd);
+
+        // Atrybuty liczbowe
+        ATTRS.forEach((key) => {
+          const td = document.createElement('td');
+          const input = makeNumberInput(i, key);
+          input.ariaLabel = key;
+          td.appendChild(input);
+          tr.appendChild(td);
+        });
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function nextId() {
+      const ids = players.map(p => Number(p.id) || 0);
+      const maxId = ids.length ? Math.max(...ids) : 0;
+      return maxId + 1;
+    }
+
+    function isNameTaken(name) {
+      const needle = (name || '').trim().toLowerCase();
+      return players.some(p => (p.name || '').trim().toLowerCase() === needle);
+    }
+
+    function readAddForm() {
+      return {
+        name: ($('#addName').value || '').trim(),
+        gra_zespolowa: asNumberOrZero($('#addGZ').value || 0),
+        kondycja:      asNumberOrZero($('#addK').value  || 0),
+        technika:      asNumberOrZero($('#addT').value  || 0),
+        uderzenie:     asNumberOrZero($('#addU').value  || 0),
+      };
+    }
+
+    function clearAddForm() {
+      $('#addName').value = '';
+      $('#addGZ').value = '';
+      $('#addK').value = '';
+      $('#addT').value = '';
+      $('#addU').value = '';
+    }
+
+    function addPlayer() {
+      const form = readAddForm();
+      if (!form.name) {
+        alert('Podaj imię/ksywkę.');
+        return;
+      }
+      if (isNameTaken(form.name)) {
+        alert('Zawodnik o takiej nazwie już istnieje.');
+        return;
+      }
+
+      const newPlayer = {
+        id: nextId(),
+        name: form.name,
+        info: "",
+        is_present: false,
+        on_break: false,
+        points: 0,
+        gra_zespolowa: form.gra_zespolowa,
+        kondycja: form.kondycja,
+        technika: form.technika,
+        uderzenie: form.uderzenie,
+        pokazuj: true
+      };
+
+      players.push(newPlayer);
+      renderTable();
+      clearAddForm();
+      setStatus(`Dodano nowego zawodnika: ${newPlayer.name} (niezapisane)`);
+    }
+
+    async function save() {
+      try {
+        setStatus('Zapisywanie…');
+        // dopilnuj typów liczbowych i obecności pola pokazuj
+        const payload = players.map(p => {
+          const out = { ...p };
+          ATTRS.forEach(k => { out[k] = asNumberOrZero(out[k]); });
+          out.pokazuj = out.pokazuj !== false; // normalizacja do bool
+          return out;
+        });
+
+        const res = await fetch('/update_data', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload, null, 2)
+        });
+
+        const data = await res.json();
+        if (data && data.status === 'success') {
+          setStatus('Dane zostały zaktualizowane ✅');
+        } else {
+          throw new Error('Błąd odpowiedzi backendu');
         }
+      } catch (e) {
+        console.error(e);
+        setStatus('Błąd zapisu.');
+        alert('Nie udało się zapisać zmian.');
+      }
+    }
 
-        // Funkcja aktualizująca dane
-        function updateData() {
-            var data = JSON.parse(document.getElementById('jsonData').value);
-            fetch('/update_data', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert('Dane zostały zaktualizowane!');
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-        }
-
-        // Wczytaj dane przy załadowaniu strony
-        window.onload = loadData;
-    </script>
+    document.addEventListener('DOMContentLoaded', () => {
+      $('#saveBtn').addEventListener('click', save);
+      $('#reloadBtn').addEventListener('click', loadData);
+      $('#addBtn').addEventListener('click', addPlayer);
+      loadData();
+    });
+  </script>
 </body>
 </html>
